@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="RdR" />
+  <meta name="date" content="2015-02-01" />
+  <meta name="keywords" content="Melbourne, holidays, calendar, R-code" />
+  <title>Melbourne Holidays</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; background-color: #f8f8f8; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+pre, code { background-color: #f8f8f8; }
+code > span.kw { color: #204a87; font-weight: bold; }
+code > span.dt { color: #204a87; }
+code > span.dv { color: #0000cf; }
+code > span.bn { color: #0000cf; }
+code > span.fl { color: #0000cf; }
+code > span.ch { color: #4e9a06; }
+code > span.st { color: #4e9a06; }
+code > span.co { color: #8f5902; font-style: italic; }
+code > span.ot { color: #8f5902; }
+code > span.al { color: #ef2929; }
+code > span.fu { color: #000000; }
+code > span.er { font-weight: bold; }
+  </style>
+</head>
+<body>
+<div id="header">
+<h1 class="title">Melbourne Holidays</h1>
+<h3 class="date">2015-02-01</h3>
+</div>
+<p>Calendar calculations are probably one of the oldest applications of math to everyday problems. In the past, real-world problems may have driven the calculation of calendars, but these days the reverse may also be true. Recently, I was looking at a time-series that seemed to have calendar effects: volumes of activities varied relative to public holidays.</p>
+<p>Since I use R for my analysis, I needed a function to calculate the public holidays for Melbourne, which I’ll describe here. Firstly, I use a the <em>lubridate</em> package for various date formats.</p>
+<pre class="sourceCode r"><code class="sourceCode r">    <span class="co"># Melbourne public holidays</span>
+    <span class="kw">require</span>(lubridate, <span class="dt">quietly=</span><span class="ot">TRUE</span>)</code></pre>
+<p>Next, we need a function to calculate the Easter date. Some years ago, there was a competition for the shortest formulas for Easter calculations in Excel. I translated <a href="http://www.contextures.com/exceleastercalculation.html">Roger Friederich</a>’s contribution to R:</p>
+<pre class="sourceCode r"><code class="sourceCode r">    <span class="co"># Easter calculation</span>
+    Easter &lt;-<span class="st"> </span>function(<span class="dt">year=</span><span class="dv">1971</span>){
+        d &lt;-<span class="st"> </span>((year %%<span class="st"> </span><span class="dv">19</span>) *<span class="st"> </span><span class="fl">18.37</span> -<span class="dv">6</span>) %%<span class="st"> </span><span class="dv">29</span>
+        s &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">as.Date</span>(<span class="kw">paste</span>(year,<span class="dv">3</span>,d,<span class="dt">sep=</span><span class="st">&quot;-&quot;</span>))) +<span class="st"> </span><span class="dv">5</span>
+        s &lt;-<span class="st"> </span>(s %/%<span class="st"> </span><span class="dv">7</span> *<span class="st"> </span><span class="dv">7</span> +<span class="st"> </span><span class="dv">24</span>)
+        <span class="kw">return</span>(<span class="kw">format</span>(<span class="kw">as.Date</span>(s,<span class="dt">origin=</span><span class="st">&quot;1970-01-01&quot;</span>),<span class="st">&quot;%d-%m-%Y&quot;</span>))
+    }</code></pre>
+<p>This function tells us that, for example, the date of Easter Sunday in 2015 falls on 2015-04-05.</p>
+<p>A number of public holidays are calculated as some n<sup>th</sup> weekday of a month. For example, Labour Day is the second Monday in February. So, we need an n<sup>th</sup> day function:</p>
+<pre class="sourceCode r"><code class="sourceCode r">    <span class="co"># calculate date of nth weekday in a month</span>
+    <span class="co"># example: 2nd Monday in the month</span>
+    <span class="co"># daynum is Sun=1, Mon=2, Tue=3,...</span>
+    nthday &lt;-<span class="st"> </span>function(daynum, n, month, year){
+        Monthstart &lt;-<span class="st"> </span><span class="kw">dmy</span>(<span class="kw">paste</span>(<span class="dv">1</span>,month,year,<span class="dt">sep=</span><span class="st">&quot;-&quot;</span>))
+        firstday &lt;-<span class="st"> </span><span class="kw">wday</span>(Monthstart)
+        delta &lt;-<span class="st"> </span>(daynum +<span class="st"> </span><span class="dv">7</span> -<span class="st"> </span>firstday) %%<span class="st"> </span><span class="dv">7</span> +<span class="st"> </span>(n<span class="dv">-1</span>)*<span class="dv">7</span>
+        <span class="kw">return</span>(Monthstart +<span class="st"> </span><span class="kw">days</span>(delta))
+    }</code></pre>
+<p>Now we’re ready to put it all together. The final function will produce a simple list of the “effective”&quot; date of the holidays. Effective date is the the actual free workday that occurs (which may be the Monday or Tuesday after the public holiday if it falls on a weekend).</p>
+<p>Unfortunately, there is an exception for ANZAC day, which does not result in a free workday if it happens to fall on a weekend. This ruling depends political rulings, so needs to be hard coded.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get list of holidays for given year</span>
+    melbhols &lt;-<span class="st"> </span>function(<span class="dt">year=</span><span class="dv">1971</span>){
+        hols &lt;-<span class="st"> </span><span class="kw">dmy</span>(<span class="kw">paste</span>( <span class="dv">1</span>,<span class="dv">1</span>, year, <span class="dt">sep=</span><span class="st">&quot;-&quot;</span>))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, <span class="kw">dmy</span>(<span class="kw">paste</span>( <span class="dv">26</span>,<span class="dv">1</span>, year, <span class="dt">sep=</span><span class="st">&quot;-&quot;</span>)))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, <span class="kw">nthday</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">3</span>,year))
+    
+        EasterSunday &lt;-<span class="st"> </span><span class="kw">dmy</span>(<span class="kw">Easter</span>(year))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, EasterSunday +<span class="st"> </span><span class="kw">ddays</span>(-<span class="dv">2</span>))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, EasterSunday +<span class="st"> </span><span class="kw">ddays</span>(<span class="dv">1</span>))
+    
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, <span class="kw">dmy</span>(<span class="kw">paste</span>(<span class="dv">25</span>,<span class="dv">4</span>,year,<span class="dt">sep=</span><span class="st">&quot;-&quot;</span>)))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, <span class="kw">nthday</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">6</span>,year))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, <span class="kw">nthday</span>(<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">11</span>,year))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, <span class="kw">dmy</span>(<span class="kw">paste</span>(<span class="dv">25</span>,<span class="dv">12</span>,year,<span class="dt">sep=</span><span class="st">&quot;-&quot;</span>)))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, <span class="kw">dmy</span>(<span class="kw">paste</span>(<span class="dv">26</span>,<span class="dv">12</span>,year,<span class="dt">sep=</span><span class="st">&quot;-&quot;</span>)))
+    
+        <span class="kw">names</span>(hols) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;NewYears&quot;</span>,<span class="st">&quot;AusDay&quot;</span>,<span class="st">&quot;LabourDay&quot;</span>,<span class="st">&quot;GoodFriday&quot;</span>,
+                     <span class="st">&quot;EasterMonday&quot;</span>,<span class="st">&quot;Anzac&quot;</span>,<span class="st">&quot;QueensBD&quot;</span>,<span class="st">&quot;CupDay&quot;</span>,
+                     <span class="st">&quot;Xmas&quot;</span>,<span class="st">&quot;BoxingDay&quot;</span>)
+    
+        <span class="co"># adjust for holidays on weekends</span>
+        nh &lt;-<span class="st"> </span><span class="kw">length</span>(hols)
+        for(h in <span class="dv">1</span>:nh){
+            if(h !=<span class="st"> </span><span class="dv">6</span>){  <span class="co"># days in lieu, except for ANZAC</span>
+                wd &lt;-<span class="st"> </span><span class="kw">wday</span>(hols[h])
+                if(wd==<span class="dv">7</span>) hols[h] &lt;-<span class="st"> </span>hols[h] +<span class="st"> </span><span class="kw">ddays</span>(<span class="dv">2</span>)
+                if(wd==<span class="dv">1</span>) hols[h] &lt;-<span class="st"> </span>hols[h] +<span class="st"> </span><span class="kw">ddays</span>(<span class="dv">1</span>)
+            }
+        }
+        if(hols[nh]==hols[nh<span class="dv">-1</span>]) hols[nh] &lt;-<span class="st"> </span>hols[nh] +<span class="st"> </span><span class="kw">ddays</span>(<span class="dv">1</span>)
+        
+        <span class="kw">return</span>(<span class="kw">format</span>(<span class="kw">as.Date</span>(hols),<span class="st">&quot;%d-%m-%Y&quot;</span>))
+    }</code></pre>
+<p>So, for 2015 the public holidays are as follows:</p>
+<pre class="sourceCode r"><code class="sourceCode r">    <span class="kw">melbhols</span>(<span class="dv">2015</span>)</code></pre>
+<pre><code>##     NewYears       AusDay    LabourDay   GoodFriday EasterMonday 
+## &quot;01-01-2015&quot; &quot;26-01-2015&quot; &quot;09-03-2015&quot; &quot;03-04-2015&quot; &quot;06-04-2015&quot; 
+##        Anzac     QueensBD       CupDay         Xmas    BoxingDay 
+## &quot;25-04-2015&quot; &quot;08-06-2015&quot; &quot;03-11-2015&quot; &quot;25-12-2015&quot; &quot;28-12-2015&quot;</code></pre>
+<div class="references">
+
+</div>
+</body>
+</html>

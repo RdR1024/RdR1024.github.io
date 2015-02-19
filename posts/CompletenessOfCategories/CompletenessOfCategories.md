@@ -1,0 +1,43 @@
+---
+title:	The Completeness of Categories
+author:	RdR
+date:	2015-01-14
+subject:	Categories, completeness, MECE, R-code
+---
+
+Lately, I've been wrestling with the question of "how many categories are enough?"  The start of many a risk analysis is to categorise the risks.  A categorisation serves as a checklist for the completeness of the analysis, and as a way of organising the many possible risks. Typically, the categories capture some essential aspect of a causal mechanism or effect which typifies the risk.  For example, we might use "Internal Fraud" and "External Fraud" as a categories, thus distinguishing different causes of a particular financial impact. Basically, risk categories are shorthand descriptions of groups of similar risks.  But how do we create a good categorisation, or at least avoid a "Celestial Empire of Benevolent Knowledge"[^1]?
+
+In [Tim's blog](http://timvangelder.com/2010/06/04/what-is-mece-and-is-it-mece/#comment-959), I commented that it is not difficult to create categories that follow at least the criteria that have been known since the 13th Century. That is, to create a set of categories that are complete and mutually exclusive, start with any set of predicates (yes/no attributes) and allow the objects of interest to be tagged with as many of the predicates as are applicable. The categories are then formed by the possible combinations of predicates. The third criteria is fulfilled to the extent that the predicates are applicable to the objects of interest.  As an example, if we wish to categorise coloured balls, then start with predicates Red, Green and Blue and then categorise balls according to the presence of each primary colour.
+
+However, there is still a question of "how many categories do we need?"  Here, the principle of focusing on the most material risks comes into play.
+
+First, let's flesh out a bit more the link between categories and risk magnitudes. Imagine that the collection of all the possible risk magnitudes forms a distribution.  That is, every risk has a magnitude and a relative frequency of occurrence. Furthermore, assume that ultimately we are interested in identifying the most material risk.  Often, there is no theoretical maximum, so "most material" means some confidence level like "the value such that 99.9% of all values are less or equal."  Also, assume that categories can be as fine-grained as we like -- in the extreme, that each risk has its own category.  Lastly, assume that we can only come up with an *arbitrary*[^2] set of categories, but that we know enough to rank them in order of magnitude.
+
+In essence, what those categories represent is an random, but ordered set of points on the magnitude distribution. And the question of interest is, what is the expected number of points needed to reach the confidence level?
+
+With a bit of R-code, we can calculate that.  We'll calculate a list of a random points along the distribution (i.e. random "quantiles"). The list will be of random length.  Then we simulate that a large number of times and calculate the average (i.e. "expected") length.  For good measure, we can also calculate an upper limit (confidene level) on the length of the list.  These lengths tell us the number of catgegories that we need.
+
+~~~r
+    # a list of random, ordered quantiles
+    froq <- function(Q){
+        Len <- 0
+        Rnd <- 0
+        while(Rnd <= Q) {
+            Rnd <- runif(1,Rnd)
+            Len <- Len+1
+        }
+        return(Len)
+    }
+    
+    # Simulate large number of times. Get average and upper confidence level.
+    X <- replicate(1e5,froq(0.999))
+    Expected <- mean(X)
+    Upper <- quantile(X,0.999)
+~~~
+	
+So, by this analysis, we need between 8 and 17 categories to have confidence that our categories cover the most material magnitude.
+
+
+[^1]: Borges critiques categorisation as a form of knowledge with an fictional example of a particularly silly set of categories: 	*...a certain Chinese encyclopedia entitled "Celestial Empire of benevolent Knowledge". In its remote pages it is written that the animals are divided into: (a) those that belong to the emperor, (b) embalmed ones, (c) those that are trained, (d) sucking pigs, (e) mermaids,(f) fabulous ones, (g) stray dogs, (h) those that are included in this classification, (i) those that tremble as if they were mad, (j) innumerable ones, (k) those drawn with a very fine camel’s hair brush, (l) others, (m) those that have just broken a flower vase, (n) those that resemble flies from a distance.* **Borges, J.L.** (1952, p.103), "The analytical language of John Wilkins", *Other Inquisitions 1937-1952*, Souvenir Press, London, 1973
+
+[^2]: As always, there is a caveat here: if the process that generates the categories does *not* generate an arbitrary (that is, randomly distributed) set of categories, then the analysis doesn't hold. So, we may have to take steps to counter the "bias"" in the process. Note that for the purposes of covering the "most material" magnitude, the counter need only be in one direction. So, for example we may deliberately chose a high threshold to begin the analysis.
