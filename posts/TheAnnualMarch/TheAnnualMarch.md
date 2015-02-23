@@ -1,8 +1,9 @@
 ---
 title:	The Annual March
-author:	RdR
+author:	Richard de Rozario
 date:	2014-06-21
 subject: Melbourne, Neumayer, analytics, Bessel
+description: Happy birthday to Melbourne's first quant, Georg von Neumayer
 ---
 
 The next time you want to catch your breath from a busy morning of statistical modelling, head to [Flagstaff Gardens](https://www.flickr.com/search/?q=flagstaff%20gardens). You can buy a nice roll from Vic Markets and enjoy the fresh air and leafy surrounds.  Go ahead, munch your lunch, look up at the fresh sky… and enjoy the hallowed grounds of Melbourne’s first analytics colleague, [Georg von Neumayer](http://en.wikipedia.org/wiki/Georg_von_Neumayer).

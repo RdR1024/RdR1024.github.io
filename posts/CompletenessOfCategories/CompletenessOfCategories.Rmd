@@ -18,8 +18,7 @@ In essence, what those categories represent is an random, but ordered set of poi
 
 With a bit of R-code, we can calculate that.  We'll calculate a list of a random points along the distribution (i.e. random "quantiles"). The list will be of random length.  Then we simulate that a large number of times and calculate the average (i.e. "expected") length.  For good measure, we can also calculate an upper limit (confidene level) on the length of the list.  These lengths tell us the number of catgegories that we need.
 
-
-```r
+```{r rndcats}
     # a list of random, ordered quantiles
     froq <- function(Q){
         Len <- 0
@@ -37,7 +36,7 @@ With a bit of R-code, we can calculate that.  We'll calculate a list of a random
     Upper <- quantile(X,0.999)
 ```
 	
-So, by this analysis, we need between 8 and 17 categories to have confidence that our categories cover the most material magnitude.
+So, by this analysis, we need between `r round(Expected)` and `r round(Upper)` categories to have confidence that our categories cover the most material magnitude.
 
 
 [^1]: Borges critiques categorisation as a form of knowledge with an fictional example of a particularly silly set of categories: 	*...a certain Chinese encyclopedia entitled "Celestial Empire of benevolent Knowledge". In its remote pages it is written that the animals are divided into: (a) those that belong to the emperor, (b) embalmed ones, (c) those that are trained, (d) sucking pigs, (e) mermaids,(f) fabulous ones, (g) stray dogs, (h) those that are included in this classification, (i) those that tremble as if they were mad, (j) innumerable ones, (k) those drawn with a very fine camel’s hair brush, (l) others, (m) those that have just broken a flower vase, (n) those that resemble flies from a distance.* **Borges, J.L.** (1952, p.103), "The analytical language of John Wilkins", *Other Inquisitions 1937-1952*, Souvenir Press, London, 1973

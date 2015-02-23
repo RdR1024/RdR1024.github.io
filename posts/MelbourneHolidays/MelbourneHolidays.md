@@ -3,6 +3,7 @@ title:	Melbourne Holidays
 author: RdR
 date:	2015-02-01
 subject: Melbourne, holidays, calendar, R-code
+description: How to calculate the public holidays of a given year for Melbourne, Australia
 ---
 
 Calendar calculations are probably one of the oldest applications of math to everyday problems. In the past, real-world problems may have driven the calculation of calendars, but these days the reverse may also be true.  Recently, I was looking at a time-series that seemed to have calendar effects:  volumes of activities varied relative to public holidays.

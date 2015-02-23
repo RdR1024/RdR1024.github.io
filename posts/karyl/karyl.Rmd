@@ -1,8 +1,9 @@
 ---
-title: "K-ary tree level probability"
-author: "RdR"
-date: "2015-02-15"
-subject: k-ary, n-ary, R-code, systemic, risk
+title: K-ary tree level probability
+author: Richard de Rozario
+date: 2015-02-07
+subject: k-ary, n-ary, hierarchies, process events, probability, R-code
+description: probability distribution of k-ary tree levels, with application for hierarchical processes.
 ---
 
 ```{r setup, echo=FALSE, purl=FALSE}

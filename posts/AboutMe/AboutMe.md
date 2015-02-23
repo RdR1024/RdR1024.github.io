@@ -1,5 +1,8 @@
 ---
 title: About me
+author: Richard de Rozario
+date:	2011-01-01
+description: Richard de Rozario
 ---
 Currently, I lead an operational risk team for a major bank, focusing on the statistical modelling and management of extreme risk scenarios, such as cybercrimes, rogue traders and natural disasters.
 

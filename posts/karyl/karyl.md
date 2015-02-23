@@ -1,9 +1,12 @@
 ---
-title: "K-ary tree level probability"
-author: "RdR"
-date: "2015-02-15"
-subject: k-ary, n-ary, R-code, systemic, risk
+title: K-ary tree level probability
+author: Richard de Rozario
+date: 2015-02-07
+subject: k-ary, n-ary, hierarchies, process events, probability, R-code
+description: probability distribution of k-ary tree levels, with application for hierarchical processes.
 ---
+
+
 
 On the weekend, I ran into a problem that needed a probability distribution that I hadn't seen before.  I googled around, but couldn't find any implementation of what I needed.  It's probably out there, somewhere on page umpteen of the search results, but I figured it was a good opportunity to implement a custom distribution in R.
 
@@ -14,7 +17,7 @@ Now imagine that events can happen across the area at random.  That means someti
 A simple model with a fixed number of lower level transactions enables us to calculate the probability that a given number of transactions are affected.  
 <figure>
 <center>
-![simple_tree](figure/simple_tree-1.png "simple tree")
+<img src="figure/simple_tree-1.png" title="plot of chunk simple_tree" alt="plot of chunk simple_tree" width="288" />
 <figcaption>*Figure 1. Simple process hierarchy as a k-ary tree. Bottom nodes are individual transactions affected.*</figcaption>
 </center>
 </figure>

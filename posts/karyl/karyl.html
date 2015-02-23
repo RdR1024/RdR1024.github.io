@@ -4,9 +4,10 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta http-equiv="Content-Style-Type" content="text/css" />
   <meta name="generator" content="pandoc" />
-  <meta name="author" content="RdR" />
-  <meta name="date" content="2015-02-15" />
-  <meta name="keywords" content="k-ary, n-ary, R-code, systemic, risk" />
+  <meta name="author" content="Richard de Rozario" />
+  <meta name="date" content="2015-02-07" />
+  <meta name="keywords" content="k-ary, n-ary, hierarchies, process events, probability, R-code" />
+  <meta name="description" content="probability distribution of k-ary tree levels, with application for hierarchical processes." />
   <title>K-ary tree level probability</title>
   <style type="text/css">code{white-space: pre;}</style>
   <style type="text/css">
@@ -30,11 +31,12 @@ code > span.fu { color: #000000; }
 code > span.er { font-weight: bold; }
   </style>
   <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+  
 </head>
 <body>
 <div id="header">
 <h1 class="title">K-ary tree level probability</h1>
-<h3 class="date">2015-02-15</h3>
+<h3 class="date">2015-02-07</h3>
 </div>
 <p>On the weekend, I ran into a problem that needed a probability distribution that I hadn’t seen before. I googled around, but couldn’t find any implementation of what I needed. It’s probably out there, somewhere on page umpteen of the search results, but I figured it was a good opportunity to implement a custom distribution in R.</p>
 <p>The context is a hierarchy, like an area of business operations, with processes that are hierarchically organised. That is, the bottom level is the processing of transactions, but then there are higher level processes that affect the transaction process. For example, setting fees across groups of transactions. Then there are even higher level processes, say, setting the criteria for market segments, within which we might have different groups of fees.</p>
@@ -42,7 +44,7 @@ code > span.er { font-weight: bold; }
 A simple model with a fixed number of lower level transactions enables us to calculate the probability that a given number of transactions are affected.<br />
 <figure>
 <center>
-<img src="figure/simple_tree-1.png" title="simple tree" alt="simple_tree" />
+<img src="figure/simple_tree-1.png" title="plot of chunk simple_tree" alt="plot of chunk simple_tree" width="288" />
 <figcaption>
 <em>Figure 1. Simple process hierarchy as a k-ary tree. Bottom nodes are individual transactions affected.</em>
 </figcaption>
