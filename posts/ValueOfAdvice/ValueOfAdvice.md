@@ -6,7 +6,7 @@ subject: advice, consulting, JAS, decision-support
 description: overview of state of research on decision support over the last decade
 ---
 
-On one of my first consulting jobs I interviewed a scientist with the then NSW Waterboard. At the end I said, "...so basically, you go around to the weirs, take samples, analyse the water quality to advise the minister, who then acts on that advice?"
+On one of my first consulting jobs I interviewed a scientist with the one of the government water authorities. At the end I said, "...so basically, you go around to the weirs, take samples, analyse the water quality to advise the minister, who then acts on that advice?"
 
 "Yes," she said, "everything except the last bit."
 
