@@ -1,2 +1,221 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>Richard de Rozario</title><link>http://richardderozario.org/</link><description>Living the analytics life in Melbourne</description><item><title>About me</title><link>http://richardderozario.org/posts/AboutMe/AboutMe.html</link><guid>http://richardderozario.org/posts/AboutMe/AboutMe.html</guid><pubDate>Sat, 01 Jan 2011 00:00:00 AEDT</pubDate><description></description></item><item><title>The Completeness of Categories</title><link>http://richardderozario.org/posts/CompletenessOfCategories/CompletenessOfCategories.html</link><guid>http://richardderozario.org/posts/CompletenessOfCategories/CompletenessOfCategories.html</guid><pubDate>Wed, 14 Jan 2015 00:00:00 AEDT</pubDate><description>Calculating how many categories are needed to reach a certain confidence level, based on some simplified assumptions.</description></item><item><title>K-ary tree level probability</title><link>http://richardderozario.org/posts/karyl/karyl.html</link><guid>http://richardderozario.org/posts/karyl/karyl.html</guid><pubDate>Sat, 07 Feb 2015 00:00:00 AEDT</pubDate><description>probability distribution of k-ary tree levels, with application for hierarchical processes.</description></item><item><title>Melbourne Holidays</title><link>http://richardderozario.org/posts/MelbourneHolidays/MelbourneHolidays.html</link><guid>http://richardderozario.org/posts/MelbourneHolidays/MelbourneHolidays.html</guid><pubDate>Sun, 01 Feb 2015 00:00:00 AEDT</pubDate><description>How to calculate the public holidays of a given year for Melbourne, Australia</description></item><item><title>The Annual March</title><link>http://richardderozario.org/posts/TheAnnualMarch/TheAnnualMarch.html</link><guid>http://richardderozario.org/posts/TheAnnualMarch/TheAnnualMarch.html</guid><pubDate>Sat, 21 Jun 2014 00:00:00 AEST</pubDate><description>Happy birthday to Melbourne’s first quant, Georg von Neumayer</description></item><item><title>The value of advice</title><link>http://richardderozario.org/posts/ValueOfAdvice/ValueOfAdvice.html</link><guid>http://richardderozario.org/posts/ValueOfAdvice/ValueOfAdvice.html</guid><pubDate>Thu, 22 Jan 2015 00:00:00 AEDT</pubDate><description>overview of state of research on decision support over the last decade</description></item></channel></rss>
+<rss xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Richard de Rozario</title><link>http://richardderozario.org/</link><description>Living the analytics life in Melbourne</description><item><title>About me</title><link>http://richardderozario.org/posts/AboutMe/AboutMe.html</link><guid>http://richardderozario.org/posts/AboutMe/AboutMe.html</guid><pubDate>Sat, 01 Jan 2011 00:00:00 AEDT</pubDate><description></description><content:encoded><![CDATA[
+<div id="header">
+<h1 class="title">About me</h1>
+</div>
+<p>Currently, I lead an operational risk team for a major bank, focusing on the statistical modelling and management of extreme risk scenarios, such as cybercrimes, rogue traders and natural disasters.</p>
+<p>For the last 25+ years I've led analytical functions, especially related to risk, business operations and information systems. Theorywise, I studied information systems at <a href="http://www.weber.edu/">Weber State University</a>, hold a postgraduate diploma in market modelling from <a href="http://www.swinburne.edu.au/">Swinburne University</a> and completed my PhD in the applied logic of business intelligence at the <a href="http://www.unimelb.edu.au/">University of Melbourne</a>.</p>
+<div class="references">
+
+</div>
+]]></content:encoded></item><item><title>The Completeness of Categories</title><link>http://richardderozario.org/posts/CompletenessOfCategories/CompletenessOfCategories.html</link><guid>http://richardderozario.org/posts/CompletenessOfCategories/CompletenessOfCategories.html</guid><pubDate>Wed, 14 Jan 2015 00:00:00 AEDT</pubDate><description>Calculating how many categories are needed to reach a certain confidence level, based on some simplified assumptions.</description><content:encoded><![CDATA[
+<div id="header">
+<h1 class="title">The Completeness of Categories</h1>
+<h3 class="date">2015-01-14</h3>
+</div>
+<p>Lately, I've been wrestling with the question of "how many categories are enough?" The start of many a risk analysis is to categorise the risks. A categorisation serves as a checklist for the completeness of the analysis, and as a way of organising the many possible risks. Typically, the categories capture some essential aspect of a causal mechanism or effect which typifies the risk. For example, we might use "Internal Fraud" and "External Fraud" as a categories, thus distinguishing different causes of a particular financial impact. Basically, risk categories are shorthand descriptions of groups of similar risks. But how do we create a good categorisation, or at least avoid a "Celestial Empire of Benevolent Knowledge"<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>?</p>
+<p>In <a href="http://timvangelder.com/2010/06/04/what-is-mece-and-is-it-mece/#comment-959">Tim's blog</a>, I commented that it is not difficult to create categories that follow at least the criteria that have been known since the 13th Century. That is, to create a set of categories that are complete and mutually exclusive, start with any set of predicates (yes/no attributes) and allow the objects of interest to be tagged with as many of the predicates as are applicable. The categories are then formed by the possible combinations of predicates. The third criteria is fulfilled to the extent that the predicates are applicable to the objects of interest. As an example, if we wish to categorise coloured balls, then start with predicates Red, Green and Blue and then categorise balls according to the presence of each primary colour.</p>
+<p>However, there is still a question of "how many categories do we need?" Here, the principle of focusing on the most material risks comes into play.</p>
+<p>First, let's flesh out a bit more the link between categories and risk magnitudes. Imagine that the collection of all the possible risk magnitudes forms a distribution. That is, every risk has a magnitude and a relative frequency of occurrence. Furthermore, assume that ultimately we are interested in identifying the most material risk. Often, there is no theoretical maximum, so "most material" means some confidence level like "the value such that 99.9% of all values are less or equal." Also, assume that categories can be as fine-grained as we like &mdash; in the extreme, that each risk has its own category. Lastly, assume that we can only come up with an <em>arbitrary</em><a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> set of categories, but that we know enough to rank them in order of magnitude.</p>
+<p>In essence, what those categories represent is an random, but ordered set of points on the magnitude distribution. And the question of interest is, what is the expected number of points needed to reach the confidence level?</p>
+<p>With a bit of R-code, we can calculate that. We'll calculate a list of a random points along the distribution (i.e. random "quantiles"). The list will be of random length. Then we simulate that a large number of times and calculate the average (i.e. "expected") length. For good measure, we can also calculate an upper limit (confidene level) on the length of the list. These lengths tell us the number of catgegories that we need.</p>
+<pre class="sourceCode r"><code class="sourceCode r">    <span class="co"># a list of random, ordered quantiles</span>
+    froq &lt;-<span class="st"> </span>function(Q){
+        Len &lt;-<span class="st"> </span><span class="dv">0</span>
+        Rnd &lt;-<span class="st"> </span><span class="dv">0</span>
+        while(Rnd &lt;=<span class="st"> </span>Q) {
+            Rnd &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1</span>,Rnd)
+            Len &lt;-<span class="st"> </span>Len<span class="dv">+1</span>
+        }
+        <span class="kw">return</span>(Len)
+    }
+    
+    <span class="co"># Simulate large number of times. Get average and upper confidence level.</span>
+    X &lt;-<span class="st"> </span><span class="kw">replicate</span>(<span class="fl">1e5</span>,<span class="kw">froq</span>(<span class="fl">0.999</span>))
+    Expected &lt;-<span class="st"> </span><span class="kw">mean</span>(X)
+    Upper &lt;-<span class="st"> </span><span class="kw">quantile</span>(X,<span class="fl">0.999</span>)</code></pre>
+<p>So, by this analysis, we need between 8 and 17 categories to have confidence that our categories cover the most material magnitude.</p>
+<div class="references">
+
+</div>
+<div class="footnotes">
+<hr /><ol><li id="fn1"><p>Borges critiques categorisation as a form of knowledge with an fictional example of a particularly silly set of categories: <em>&#8230;a certain Chinese encyclopedia entitled "Celestial Empire of benevolent Knowledge". In its remote pages it is written that the animals are divided into: (a) those that belong to the emperor, (b) embalmed ones, (c) those that are trained, (d) sucking pigs, (e) mermaids,(f) fabulous ones, (g) stray dogs, (h) those that are included in this classification, (i) those that tremble as if they were mad, (j) innumerable ones, (k) those drawn with a very fine camel's hair brush, (l) others, (m) those that have just broken a flower vase, (n) those that resemble flies from a distance.</em> <strong>Borges, J.L.</strong> (1952, p.103), "The analytical language of John Wilkins", <em>Other Inquisitions 1937-1952</em>, Souvenir Press, London, 1973<a href="#fnref1"><U+21A9></a></p></li>
+<li id="fn2"><p>As always, there is a caveat here: if the process that generates the categories does <em>not</em> generate an arbitrary (that is, randomly distributed) set of categories, then the analysis doesn't hold. So, we may have to take steps to counter the "bias"" in the process. Note that for the purposes of covering the "most material" magnitude, the counter need only be in one direction. So, for example we may deliberately chose a high threshold to begin the analysis.<a href="#fnref2"><U+21A9></a></p></li>
+</ol></div>
+
+ ]]></content:encoded></item><item><title>K-ary tree level probability</title><link>http://richardderozario.org/posts/karyl/karyl.html</link><guid>http://richardderozario.org/posts/karyl/karyl.html</guid><pubDate>Sat, 07 Feb 2015 00:00:00 AEDT</pubDate><description>probability distribution of k-ary tree levels, with application for hierarchical processes.</description><content:encoded><![CDATA[
+<div id="header">
+<h1 class="title">K-ary tree level probability</h1>
+<h3 class="date">2015-02-07</h3>
+</div>
+<p>On the weekend, I ran into a problem that needed a probability distribution that I hadn't seen before. I googled around, but couldn't find any implementation of what I needed. It's probably out there, somewhere on page umpteen of the search results, but I figured it was a good opportunity to implement a custom distribution in R.</p>
+<p>The context is a hierarchy, like an area of business operations, with processes that are hierarchically organised. That is, the bottom level is the processing of transactions, but then there are higher level processes that affect the transaction process. For example, setting fees across groups of transactions. Then there are even higher level processes, say, setting the criteria for market segments, within which we might have different groups of fees.</p>
+<p>Now imagine that events can happen across the area at random. That means sometimes the event will touch a transaction at the bottom level, but sometimes at a higher level. If the event occurs at a higher level, then that will affect multiple transactions at the bottom level. So, what I want to know is, what is the probability that an event will happen at a particular level, and how many bottom level transactions will be affected by that event?</p>
+A simple model with a fixed number of lower level transactions enables us to calculate the probability that a given number of transactions are affected.<br /><figure><center>
+<img title="plot of chunk simple_tree" alt="plot of chunk simple_tree" width="288" src="http://richardderozario.org/posts/posts/karyl/figure/simple_tree-1.png" /><figcaption><em>Figure 1. Simple process hierarchy as a k-ary tree. Bottom nodes are individual transactions affected.</em>
+</figcaption></center>
+</figure><p>Using the <em>diagram</em> package <span class="citation">(Soetaert 2009)</span>, I have drawn a <a href="http://en.wikipedia.org/wiki/Hasse_diagram">Hasse</a> diagram in <em>Figure 1</em> of a small example hierarchy of 13 possible events, some of which are higher level, which means they affect multiple lower-level transactions. In this example, it's easy to see that there are 4 possible events where more than a single transaction is affected. This type of hierarchy is called an <a href="http://en.wikipedia.org/wiki/K-ary_tree">k-ary tree</a>. For the purpose of estimating the number of transactions affected by a higher level event, we can turn the tree into a a probability function.</p>
+<p>A convenient form of the probability function is the probability that a node is on a particular level, given a fixed group size (the number of nodes belonging to a direct parent node) and the maximum number of levels. To derive the probability mass function, we use the formula that calculates the total number of nodes in the tree (N), where <span class="math">\(L\)</span> is the maximum level, starting from zero at the top node, and <span class="math">\(g\)</span> is the group size:</p>
+<p><span class="math">\[
+N = f(L,g) =
+    \sum^{L}_{i=0} g^i = \frac{g^{L+1} - 1}{g-1}, \quad L,g,i \in \mathbb{N}_0, g&gt;1
+\]</span></p>
+<p>Each node on a level other than the last level is a tree in itself. So, the number of end-nodes that a node on a given level <span class="math">\(i\)</span> will reach is calculated as <span class="math">\(g^{L-i}\)</span>, and the probability that a node is on level <span class="math">\(i\)</span> is given by the following probability mass function (PMF):</p>
+<p><span class="math">\[
+Pr(i;L,g) = \frac{1}{N}g^i = \frac{g^i(g-1)}{g^{L+1}-1}, \quad i&lt;=L
+\]</span></p>
+<p>The corresponding cumulative distribution function (CDF) is:</p>
+<p><span class="math">\[
+Pr(i&lt;=n;L,g) = \frac{1}{N}\sum_{i=0}^n g^i = \frac{g^{n+1}-1}{g^{L+1}-1}
+\]</span></p>
+<p>The full set of probability functions for the k-ary levels can be coded in R as follows:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># k-ary tree level probability functions (without error checks)</span>
+dkaryl &lt;-<span class="st"> </span>function(i,L,g) (g^i *<span class="st"> </span>(g<span class="dv">-1</span>)) /<span class="st"> </span>(g^(L<span class="dv">+1</span>) -<span class="dv">1</span>)
+pkaryl &lt;-<span class="st"> </span>function(n,L,g) (g^(n<span class="dv">+1</span>) -<span class="dv">1</span>) /<span class="st"> </span>(g^(L<span class="dv">+1</span>) -<span class="dv">1</span>)
+qkaryl &lt;-<span class="st"> </span>function(q,L,g) <span class="kw">floor</span>((<span class="kw">log</span>(q*(g^(L<span class="dv">+1</span>)-<span class="dv">1</span>)+<span class="dv">1</span>)-<span class="kw">log</span>(g))/<span class="kw">log</span>(g))
+rkaryl &lt;-<span class="st"> </span>function(n,L,g) <span class="kw">sample</span>(<span class="dv">0</span>:L,n,<span class="dt">replace=</span><span class="ot">TRUE</span>,<span class="dt">prob=</span><span class="kw">dkaryl</span>(<span class="dv">0</span>:L,L,g))</code></pre>
+Note that the probability functions range over the number of levels in a tree, which may not be all that many. The following example draws a histogram for a tree with 10 levels and groups of 5.
+<figure><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">rkaryl</span>(<span class="fl">1e3</span>,<span class="dv">10</span>,<span class="dv">5</span>)
+<span class="kw">hist</span>(x,<span class="dt">main=</span><span class="st">"k-ary tree level probability mass"</span>,
+     <span class="dt">xlab=</span><span class="st">"level"</span>,<span class="dt">col=</span><span class="st">"grey"</span>,<span class="dt">xlim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">10</span>))</code></pre>
+<img src="http://richardderozario.org/posts/posts/karyl/figure/example-1.png" /><figcaption><em>Figure 2. histogram of k-ary level probability density with max level of 10 and groups of 5.</em>
+</figcaption></figure><p><em>Bibliography</em></p>
+<div class="references">
+<p>Soetaert, Karline. 2009. "R Package Diagram: Visualising Simple Graphs, Flowcharts, and Webs." software library; CRAN.</p>
+</div>
+
+]]></content:encoded></item><item><title>Melbourne Holidays</title><link>http://richardderozario.org/posts/MelbourneHolidays/MelbourneHolidays.html</link><guid>http://richardderozario.org/posts/MelbourneHolidays/MelbourneHolidays.html</guid><pubDate>Sun, 01 Feb 2015 00:00:00 AEDT</pubDate><description>How to calculate the public holidays of a given year for Melbourne, Australia</description><content:encoded><![CDATA[
+<div id="header">
+<h1 class="title">Melbourne Holidays</h1>
+<h3 class="date">2015-02-01</h3>
+</div>
+<p>Calendar calculations are probably one of the oldest applications of math to everyday problems. In the past, real-world problems may have driven the calculation of calendars, but these days the reverse may also be true. Recently, I was looking at a time-series that seemed to have calendar effects: volumes of activities varied relative to public holidays.</p>
+<p>Since I use R for my analysis, I needed a function to calculate the public holidays for Melbourne, which I'll describe here. Firstly, I use a the <em>lubridate</em> package for various date formats.</p>
+<pre class="sourceCode r"><code class="sourceCode r">    <span class="co"># Melbourne public holidays</span>
+    <span class="kw">require</span>(lubridate, <span class="dt">quietly=</span><span class="ot">TRUE</span>)</code></pre>
+<p>Next, we need a function to calculate the Easter date. Some years ago, there was a competition for the shortest formulas for Easter calculations in Excel. I translated <a href="http://www.contextures.com/exceleastercalculation.html">Roger Friederich</a>'s contribution to R:</p>
+<pre class="sourceCode r"><code class="sourceCode r">    <span class="co"># Easter calculation</span>
+    Easter &lt;-<span class="st"> </span>function(<span class="dt">year=</span><span class="dv">1971</span>){
+        d &lt;-<span class="st"> </span>((year %%<span class="st"> </span><span class="dv">19</span>) *<span class="st"> </span><span class="fl">18.37</span> -<span class="dv">6</span>) %%<span class="st"> </span><span class="dv">29</span>
+        s &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">as.Date</span>(<span class="kw">paste</span>(year,<span class="dv">3</span>,d,<span class="dt">sep=</span><span class="st">"-"</span>))) +<span class="st"> </span><span class="dv">5</span>
+        s &lt;-<span class="st"> </span>(s %/%<span class="st"> </span><span class="dv">7</span> *<span class="st"> </span><span class="dv">7</span> +<span class="st"> </span><span class="dv">24</span>)
+        <span class="kw">return</span>(<span class="kw">format</span>(<span class="kw">as.Date</span>(s,<span class="dt">origin=</span><span class="st">"1970-01-01"</span>),<span class="st">"%d-%m-%Y"</span>))
+    }</code></pre>
+<p>This function tells us that, for example, the date of Easter Sunday in 2015 falls on 2015-04-05.</p>
+<p>A number of public holidays are calculated as some n<sup>th</sup> weekday of a month. For example, Labour Day is the second Monday in February. So, we need an n<sup>th</sup> day function:</p>
+<pre class="sourceCode r"><code class="sourceCode r">    <span class="co"># calculate date of nth weekday in a month</span>
+    <span class="co"># example: 2nd Monday in the month</span>
+    <span class="co"># daynum is Sun=1, Mon=2, Tue=3,...</span>
+    nthday &lt;-<span class="st"> </span>function(daynum, n, month, year){
+        Monthstart &lt;-<span class="st"> </span><span class="kw">dmy</span>(<span class="kw">paste</span>(<span class="dv">1</span>,month,year,<span class="dt">sep=</span><span class="st">"-"</span>))
+        firstday &lt;-<span class="st"> </span><span class="kw">wday</span>(Monthstart)
+        delta &lt;-<span class="st"> </span>(daynum +<span class="st"> </span><span class="dv">7</span> -<span class="st"> </span>firstday) %%<span class="st"> </span><span class="dv">7</span> +<span class="st"> </span>(n<span class="dv">-1</span>)*<span class="dv">7</span>
+        <span class="kw">return</span>(Monthstart +<span class="st"> </span><span class="kw">days</span>(delta))
+    }</code></pre>
+<p>Now we're ready to put it all together. The final function will produce a simple list of the "effective"" date of the holidays. Effective date is the the actual free workday that occurs (which may be the Monday or Tuesday after the public holiday if it falls on a weekend).</p>
+<p>Unfortunately, there is an exception for ANZAC day, which does not result in a free workday if it happens to fall on a weekend. This ruling depends political rulings, so needs to be hard coded.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get list of holidays for given year</span>
+    melbhols &lt;-<span class="st"> </span>function(<span class="dt">year=</span><span class="dv">1971</span>){
+        hols &lt;-<span class="st"> </span><span class="kw">dmy</span>(<span class="kw">paste</span>( <span class="dv">1</span>,<span class="dv">1</span>, year, <span class="dt">sep=</span><span class="st">"-"</span>))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, <span class="kw">dmy</span>(<span class="kw">paste</span>( <span class="dv">26</span>,<span class="dv">1</span>, year, <span class="dt">sep=</span><span class="st">"-"</span>)))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, <span class="kw">nthday</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">3</span>,year))
+    
+        EasterSunday &lt;-<span class="st"> </span><span class="kw">dmy</span>(<span class="kw">Easter</span>(year))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, EasterSunday +<span class="st"> </span><span class="kw">ddays</span>(-<span class="dv">2</span>))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, EasterSunday +<span class="st"> </span><span class="kw">ddays</span>(<span class="dv">1</span>))
+    
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, <span class="kw">dmy</span>(<span class="kw">paste</span>(<span class="dv">25</span>,<span class="dv">4</span>,year,<span class="dt">sep=</span><span class="st">"-"</span>)))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, <span class="kw">nthday</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">6</span>,year))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, <span class="kw">nthday</span>(<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">11</span>,year))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, <span class="kw">dmy</span>(<span class="kw">paste</span>(<span class="dv">25</span>,<span class="dv">12</span>,year,<span class="dt">sep=</span><span class="st">"-"</span>)))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, <span class="kw">dmy</span>(<span class="kw">paste</span>(<span class="dv">26</span>,<span class="dv">12</span>,year,<span class="dt">sep=</span><span class="st">"-"</span>)))
+    
+        <span class="kw">names</span>(hols) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"NewYears"</span>,<span class="st">"AusDay"</span>,<span class="st">"LabourDay"</span>,<span class="st">"GoodFriday"</span>,
+                     <span class="st">"EasterMonday"</span>,<span class="st">"Anzac"</span>,<span class="st">"QueensBD"</span>,<span class="st">"CupDay"</span>,
+                     <span class="st">"Xmas"</span>,<span class="st">"BoxingDay"</span>)
+    
+        <span class="co"># adjust for holidays on weekends</span>
+        nh &lt;-<span class="st"> </span><span class="kw">length</span>(hols)
+        for(h in <span class="dv">1</span>:nh){
+            if(h !=<span class="st"> </span><span class="dv">6</span>){  <span class="co"># days in lieu, except for ANZAC</span>
+                wd &lt;-<span class="st"> </span><span class="kw">wday</span>(hols[h])
+                if(wd==<span class="dv">7</span>) hols[h] &lt;-<span class="st"> </span>hols[h] +<span class="st"> </span><span class="kw">ddays</span>(<span class="dv">2</span>)
+                if(wd==<span class="dv">1</span>) hols[h] &lt;-<span class="st"> </span>hols[h] +<span class="st"> </span><span class="kw">ddays</span>(<span class="dv">1</span>)
+            }
+        }
+        if(hols[nh]==hols[nh<span class="dv">-1</span>]) hols[nh] &lt;-<span class="st"> </span>hols[nh] +<span class="st"> </span><span class="kw">ddays</span>(<span class="dv">1</span>)
+        
+        <span class="kw">return</span>(<span class="kw">format</span>(<span class="kw">as.Date</span>(hols),<span class="st">"%d-%m-%Y"</span>))
+    }</code></pre>
+<p>So, for 2015 the public holidays are as follows:</p>
+<pre class="sourceCode r"><code class="sourceCode r">    <span class="kw">melbhols</span>(<span class="dv">2015</span>)</code></pre>
+<pre><code>##     NewYears       AusDay    LabourDay   GoodFriday EasterMonday 
+## "01-01-2015" "26-01-2015" "09-03-2015" "03-04-2015" "06-04-2015" 
+##        Anzac     QueensBD       CupDay         Xmas    BoxingDay 
+## "25-04-2015" "08-06-2015" "03-11-2015" "25-12-2015" "28-12-2015"</code></pre>
+<div class="references">
+
+</div>
+
+]]></content:encoded></item><item><title>The Annual March</title><link>http://richardderozario.org/posts/TheAnnualMarch/TheAnnualMarch.html</link><guid>http://richardderozario.org/posts/TheAnnualMarch/TheAnnualMarch.html</guid><pubDate>Sat, 21 Jun 2014 00:00:00 AEST</pubDate><description>Happy birthday to Melbourne’s first quant, Georg von Neumayer</description><content:encoded><![CDATA[
+<div id="header">
+<h1 class="title">The Annual March</h1>
+<h3 class="date">2014-06-21</h3>
+</div>
+<p>The next time you want to catch your breath from a busy morning of statistical modelling, head to <a href="https://www.flickr.com/search/?q=flagstaff%20gardens">Flagstaff Gardens</a>. You can buy a nice roll from Vic Markets and enjoy the fresh air and leafy surrounds. Go ahead, munch your lunch, look up at the fresh sky&#8230; and enjoy the hallowed grounds of Melbourne's first analytics colleague, <a href="http://en.wikipedia.org/wiki/Georg_von_Neumayer">Georg von Neumayer</a>.</p>
+<p>We may call our work "predictive analytics" now, but that's just the latest spin. Trying to predict things with calculations based on careful data gathering goes back a long way. The forecasting of weather events qualifies as one of the ancient roots of our industry. Stemming from these roots is Georg's work in establishing Melbourne's first meteorological observatory at Flagstaff Gardens in 1858.</p>
+<p>I came across Georg when I started wondering who the first quant was in Melbourne. But then I got curious about his work, because he predates the foundation of modern timeseries analysis by Yule in the late 1800s<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>. It turns out that Georg used Bessel functions, which in his day would have been as innovative as random trees are to us. Here is a small section of his work<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a>:</p>
+<pre><code>
+    If S signifies any of the meteorological elements, 
+    n the number of the month commencing with the 1st of January, 
+    the annual march is expressed by the following formula of Bessel:
+
+    S(n) = s* + u' sin{(n+1/2) 30  + v' - 15 } + u'' sin{(n+1/2) 60  + 
+    v-30 } + u''' sin{(n+1/2) 90  + v''' - 45 } + ...
+
+    By the aid of this formula, the monthly mean values for each 
+    element are computed and compared with the actual mean values 
+    observed, thereby affording a means for testing the reliability 
+    of the formula.
+</code>
+</pre>
+<p>Aside from the particular approach, the predictive work sounds very familiar. Georg also faced other familiar challenges. He had to get foreign investment to fund his work and people questioned whether his work had any practical use, and whether it was even valid<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a>. Georg would be right at home in the analytics community of today's Melbourne.</p>
+<p>Happy Birthday, Georg.</p>
+<div class="references">
+
+</div>
+<div class="footnotes">
+<hr /><ol><li id="fn1"><p>Terence Mills (2011) <em><a href="http://www.amazon.com/Foundations-Analysis-Palgrave-Advanced-Econometrics/dp/0230290183">Foundations of Modern Time Series Analysis</a></em>,Ch.2<a href="#fnref1"><U+21A9></a></p></li>
+<li id="fn2"><p>G. Neumayer (1860) <a href="http://search.slv.vic.gov.au/primo_library/libweb/action/dlDisplay.do?vid=MAIN&amp;reset_config=true&amp;docId=SLV_VOYAGER1211729">Results of the magnetical, nautical and meteorological observations made and collected at the Flagstaff Observatory, Melbourne, and at various stations in the Colony of Victoria, March, 1858 to February, 1859</a><a href="#fnref2"><U+21A9></a></p></li>
+<li id="fn3"><p>M.L.A. (1858, Aug 11) "<a href="http://trove.nla.gov.au/ndp/del/article/7299088?searchTerm=neumayer&amp;searchLimits=exactPhrase|||anyWords|||notWords|||requestHandler|||dateFrom=1858-08-11|||dateTo=1858-08-11|||l-advtitle=13|||l-advcategory=Article|||sortby">Professor Neumayer's observations</a>.", <a href="http://en.wikipedia.org/wiki/The_Argus_%28Melbourne%29">The Argus</a>, Melbourne<a href="#fnref3"><U+21A9></a></p></li>
+</ol></div>
+
+]]></content:encoded></item><item><title>The value of advice</title><link>http://richardderozario.org/posts/ValueOfAdvice/ValueOfAdvice.html</link><guid>http://richardderozario.org/posts/ValueOfAdvice/ValueOfAdvice.html</guid><pubDate>Thu, 22 Jan 2015 00:00:00 AEDT</pubDate><description>overview of state of research on decision support over the last decade</description><content:encoded><![CDATA[
+<div id="header">
+<h1 class="title">The value of advice</h1>
+<h3 class="date">2015-01-22</h3>
+</div>
+<p>On one of my first consulting jobs I interviewed a scientist with the one of the government water authorities. At the end I said, "&#8230;so basically, you go around to the weirs, take samples, analyse the water quality to advise the minister, who then acts on that advice?"</p>
+<p>"Yes," she said, "everything except the last bit."</p>
+<p>Currently, I'm taking stock to see where the research on decision support has gotten to in the last decade or so &mdash; especially with regards to the core problem of "usage".</p>
+<p>Most results were largely known at the turn of the century:</p>
+<ol style="list-style-type: decimal"><li>Individuals tend to use bounded rationality and recognition-based decision strategies</li>
+<li>Decision making processes in organisations are non-linear and often unclear in how (or if) information is actually used</li>
+<li>Individuals tend to seek confirming information</li>
+<li>Uptake of decision support systems is generally poor</li>
+<li>and yet, and yet&#8230; models, even simple ones, tend to outperform intuition</li>
+</ol><p>One of the most interesting reads is McCown's review of decision making by farmers in the USA and Australia<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>. Amidst a broad review of the history of decision support systems for farmers, he observes that <em>normative</em> (that advise people on how they <em>should</em> decide) systems are less popular. However, this factor is mitigated by how much autonomy the decision maker has already. So, managers with less (perceived) autonomy are more likely to accept advise given by systems that are already part of the accepted norms of their organisations.</p>
+<p>The issues of usage are compounded in an organisational setting. As the seminal article by Feldman and March<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> pointed out, there is a surface structure in organisations for making decisions (procedures, committees, etc.) that doesn't seem align with the "reality" of how decisions are made.</p>
+<p>Persistent problems like these have led to suggestions of different paradigms for decision making. For instance, McCown points to a more indirect approach, where the systems provide an opportunity for the decision maker to develop new mental models ("sense making") about the particular situation, options and uncertainties. From another perspective, Tsoukas sees no particular decisions being made in the classical sense of weighing options and making discrete choices, but rather the unfolding logic of a <em>practice</em>. Here, a practice is the following of a routine or ongoing process, solving breakdowns that occur in the process through practical coping.</p>
+<p>Another perspective comes from the focus on Judge-Advocate System (JAS) of decision making. This models any situation where the decision maker (judge) takes advise, to some extent, from advisers (advocates). Bonaccio and Dalal<a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> provide an overview of the research up to 2005. Some of the findings, such as the tendency of judges to overweigh their own opinions to that of the advisers, and the improved accuracy of "averaging" different advice, complement findings of confirmation bias by other research. The discounting of advice in favour of one's own opinion is mediated by factors such as the balance of expertise between judge and advocate, the power of the judge, etc. A prominent factor is that advice that comes at some cost is discounted less.</p>
+<p>These different perspectives lead to interesting approaches for decision support processes and infrastructures. For example, the sense making view, would support simulated environments for exploration, rather than pre-programmed solutions. The practice context would support embedding of decision support into the environment and infrastructure that is already part of organisational routines. Lastly, a fun thought is that the cost factor in advice discounting may mean that, all else being equal, it's better to provide advice as a fee charging consultant than as a freely accessible employee.</p>
+<div class="references">
+
+</div>
+<div class="footnotes">
+<hr /><ol><li id="fn1"><p>McCown R. L. (2005) "New Thinking About Farmer Decision Makers", in <em>The Farmer's Decision: Balancing Economic Successful Agriculture Production with Environmental Quality</em>, J.L. Hatfield (ed.), Soil and Water Conservation Society, Ankey, Iowa, USA, p11-44<a href="#fnref1"><U+21A9></a></p></li>
+<li id="fn2"><p>Feldman M. S. and March J. G. (1981) "Information in Organizations as Signal and Symbol", Administrative Science Quarterly, V26N2, p171-186<a href="#fnref2"><U+21A9></a></p></li>
+<li id="fn3"><p>Bonaccio, S. and Dalal R. (2006) "Advice taking and decision-making: An integrative literature review, and implications for the organizational sciences", <em>Organizational Behavior and Human Decision Processes 101</em>, p127-151<a href="#fnref3"><U+21A9></a></p></li>
+</ol></div>
+
+]]></content:encoded></item></channel></rss>

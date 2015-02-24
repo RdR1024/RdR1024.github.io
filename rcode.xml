@@ -1,2 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0"><channel><title>Richard de Rozario</title><link>http://richardderozario.org/</link><description>Living the analytics life in Melbourne</description><item><title>K-ary tree level probability</title><link>http://richardderozario.org/posts/karyl/karyl.html</link><guid>http://richardderozario.org/posts/karyl/karyl.html</guid><pubDate>Sat, 07 Feb 2015 00:00:00 AEDT</pubDate><description>probability distribution of k-ary tree levels, with application for hierarchical processes.</description></item><item><title>Melbourne Holidays</title><link>http://richardderozario.org/posts/MelbourneHolidays/MelbourneHolidays.html</link><guid>http://richardderozario.org/posts/MelbourneHolidays/MelbourneHolidays.html</guid><pubDate>Sun, 01 Feb 2015 00:00:00 AEDT</pubDate><description>How to calculate the public holidays of a given year for Melbourne, Australia</description></item></channel></rss>
+<rss xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Richard de Rozario</title><link>http://richardderozario.org/</link><description>Living the analytics life in Melbourne</description><item><title>K-ary tree level probability</title><link>http://richardderozario.org/posts/karyl/karyl.html</link><guid>http://richardderozario.org/posts/karyl/karyl.html</guid><pubDate>Sat, 07 Feb 2015 00:00:00 AEDT</pubDate><description>probability distribution of k-ary tree levels, with application for hierarchical processes.</description><content:encoded><![CDATA[
+<div id="header">
+<h1 class="title">K-ary tree level probability</h1>
+<h3 class="date">2015-02-07</h3>
+</div>
+<p>On the weekend, I ran into a problem that needed a probability distribution that I hadn't seen before. I googled around, but couldn't find any implementation of what I needed. It's probably out there, somewhere on page umpteen of the search results, but I figured it was a good opportunity to implement a custom distribution in R.</p>
+<p>The context is a hierarchy, like an area of business operations, with processes that are hierarchically organised. That is, the bottom level is the processing of transactions, but then there are higher level processes that affect the transaction process. For example, setting fees across groups of transactions. Then there are even higher level processes, say, setting the criteria for market segments, within which we might have different groups of fees.</p>
+<p>Now imagine that events can happen across the area at random. That means sometimes the event will touch a transaction at the bottom level, but sometimes at a higher level. If the event occurs at a higher level, then that will affect multiple transactions at the bottom level. So, what I want to know is, what is the probability that an event will happen at a particular level, and how many bottom level transactions will be affected by that event?</p>
+A simple model with a fixed number of lower level transactions enables us to calculate the probability that a given number of transactions are affected.<br /><figure><center>
+<img title="plot of chunk simple_tree" alt="plot of chunk simple_tree" width="288" src="http://richardderozario.org/posts/posts/karyl/figure/simple_tree-1.png" /><figcaption><em>Figure 1. Simple process hierarchy as a k-ary tree. Bottom nodes are individual transactions affected.</em>
+</figcaption></center>
+</figure><p>Using the <em>diagram</em> package <span class="citation">(Soetaert 2009)</span>, I have drawn a <a href="http://en.wikipedia.org/wiki/Hasse_diagram">Hasse</a> diagram in <em>Figure 1</em> of a small example hierarchy of 13 possible events, some of which are higher level, which means they affect multiple lower-level transactions. In this example, it's easy to see that there are 4 possible events where more than a single transaction is affected. This type of hierarchy is called an <a href="http://en.wikipedia.org/wiki/K-ary_tree">k-ary tree</a>. For the purpose of estimating the number of transactions affected by a higher level event, we can turn the tree into a a probability function.</p>
+<p>A convenient form of the probability function is the probability that a node is on a particular level, given a fixed group size (the number of nodes belonging to a direct parent node) and the maximum number of levels. To derive the probability mass function, we use the formula that calculates the total number of nodes in the tree (N), where <span class="math">\(L\)</span> is the maximum level, starting from zero at the top node, and <span class="math">\(g\)</span> is the group size:</p>
+<p><span class="math">\[
+N = f(L,g) =
+    \sum^{L}_{i=0} g^i = \frac{g^{L+1} - 1}{g-1}, \quad L,g,i \in \mathbb{N}_0, g&gt;1
+\]</span></p>
+<p>Each node on a level other than the last level is a tree in itself. So, the number of end-nodes that a node on a given level <span class="math">\(i\)</span> will reach is calculated as <span class="math">\(g^{L-i}\)</span>, and the probability that a node is on level <span class="math">\(i\)</span> is given by the following probability mass function (PMF):</p>
+<p><span class="math">\[
+Pr(i;L,g) = \frac{1}{N}g^i = \frac{g^i(g-1)}{g^{L+1}-1}, \quad i&lt;=L
+\]</span></p>
+<p>The corresponding cumulative distribution function (CDF) is:</p>
+<p><span class="math">\[
+Pr(i&lt;=n;L,g) = \frac{1}{N}\sum_{i=0}^n g^i = \frac{g^{n+1}-1}{g^{L+1}-1}
+\]</span></p>
+<p>The full set of probability functions for the k-ary levels can be coded in R as follows:</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># k-ary tree level probability functions (without error checks)</span>
+dkaryl &lt;-<span class="st"> </span>function(i,L,g) (g^i *<span class="st"> </span>(g<span class="dv">-1</span>)) /<span class="st"> </span>(g^(L<span class="dv">+1</span>) -<span class="dv">1</span>)
+pkaryl &lt;-<span class="st"> </span>function(n,L,g) (g^(n<span class="dv">+1</span>) -<span class="dv">1</span>) /<span class="st"> </span>(g^(L<span class="dv">+1</span>) -<span class="dv">1</span>)
+qkaryl &lt;-<span class="st"> </span>function(q,L,g) <span class="kw">floor</span>((<span class="kw">log</span>(q*(g^(L<span class="dv">+1</span>)-<span class="dv">1</span>)+<span class="dv">1</span>)-<span class="kw">log</span>(g))/<span class="kw">log</span>(g))
+rkaryl &lt;-<span class="st"> </span>function(n,L,g) <span class="kw">sample</span>(<span class="dv">0</span>:L,n,<span class="dt">replace=</span><span class="ot">TRUE</span>,<span class="dt">prob=</span><span class="kw">dkaryl</span>(<span class="dv">0</span>:L,L,g))</code></pre>
+Note that the probability functions range over the number of levels in a tree, which may not be all that many. The following example draws a histogram for a tree with 10 levels and groups of 5.
+<figure><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">rkaryl</span>(<span class="fl">1e3</span>,<span class="dv">10</span>,<span class="dv">5</span>)
+<span class="kw">hist</span>(x,<span class="dt">main=</span><span class="st">"k-ary tree level probability mass"</span>,
+     <span class="dt">xlab=</span><span class="st">"level"</span>,<span class="dt">col=</span><span class="st">"grey"</span>,<span class="dt">xlim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">10</span>))</code></pre>
+<img src="http://richardderozario.org/posts/posts/karyl/figure/example-1.png" /><figcaption><em>Figure 2. histogram of k-ary level probability density with max level of 10 and groups of 5.</em>
+</figcaption></figure><p><em>Bibliography</em></p>
+<div class="references">
+<p>Soetaert, Karline. 2009. "R Package Diagram: Visualising Simple Graphs, Flowcharts, and Webs." software library; CRAN.</p>
+</div>
+
+]]></content:encoded></item><item><title>Melbourne Holidays</title><link>http://richardderozario.org/posts/MelbourneHolidays/MelbourneHolidays.html</link><guid>http://richardderozario.org/posts/MelbourneHolidays/MelbourneHolidays.html</guid><pubDate>Sun, 01 Feb 2015 00:00:00 AEDT</pubDate><description>How to calculate the public holidays of a given year for Melbourne, Australia</description><content:encoded><![CDATA[
+<div id="header">
+<h1 class="title">Melbourne Holidays</h1>
+<h3 class="date">2015-02-01</h3>
+</div>
+<p>Calendar calculations are probably one of the oldest applications of math to everyday problems. In the past, real-world problems may have driven the calculation of calendars, but these days the reverse may also be true. Recently, I was looking at a time-series that seemed to have calendar effects: volumes of activities varied relative to public holidays.</p>
+<p>Since I use R for my analysis, I needed a function to calculate the public holidays for Melbourne, which I'll describe here. Firstly, I use a the <em>lubridate</em> package for various date formats.</p>
+<pre class="sourceCode r"><code class="sourceCode r">    <span class="co"># Melbourne public holidays</span>
+    <span class="kw">require</span>(lubridate, <span class="dt">quietly=</span><span class="ot">TRUE</span>)</code></pre>
+<p>Next, we need a function to calculate the Easter date. Some years ago, there was a competition for the shortest formulas for Easter calculations in Excel. I translated <a href="http://www.contextures.com/exceleastercalculation.html">Roger Friederich</a>'s contribution to R:</p>
+<pre class="sourceCode r"><code class="sourceCode r">    <span class="co"># Easter calculation</span>
+    Easter &lt;-<span class="st"> </span>function(<span class="dt">year=</span><span class="dv">1971</span>){
+        d &lt;-<span class="st"> </span>((year %%<span class="st"> </span><span class="dv">19</span>) *<span class="st"> </span><span class="fl">18.37</span> -<span class="dv">6</span>) %%<span class="st"> </span><span class="dv">29</span>
+        s &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">as.Date</span>(<span class="kw">paste</span>(year,<span class="dv">3</span>,d,<span class="dt">sep=</span><span class="st">"-"</span>))) +<span class="st"> </span><span class="dv">5</span>
+        s &lt;-<span class="st"> </span>(s %/%<span class="st"> </span><span class="dv">7</span> *<span class="st"> </span><span class="dv">7</span> +<span class="st"> </span><span class="dv">24</span>)
+        <span class="kw">return</span>(<span class="kw">format</span>(<span class="kw">as.Date</span>(s,<span class="dt">origin=</span><span class="st">"1970-01-01"</span>),<span class="st">"%d-%m-%Y"</span>))
+    }</code></pre>
+<p>This function tells us that, for example, the date of Easter Sunday in 2015 falls on 2015-04-05.</p>
+<p>A number of public holidays are calculated as some n<sup>th</sup> weekday of a month. For example, Labour Day is the second Monday in February. So, we need an n<sup>th</sup> day function:</p>
+<pre class="sourceCode r"><code class="sourceCode r">    <span class="co"># calculate date of nth weekday in a month</span>
+    <span class="co"># example: 2nd Monday in the month</span>
+    <span class="co"># daynum is Sun=1, Mon=2, Tue=3,...</span>
+    nthday &lt;-<span class="st"> </span>function(daynum, n, month, year){
+        Monthstart &lt;-<span class="st"> </span><span class="kw">dmy</span>(<span class="kw">paste</span>(<span class="dv">1</span>,month,year,<span class="dt">sep=</span><span class="st">"-"</span>))
+        firstday &lt;-<span class="st"> </span><span class="kw">wday</span>(Monthstart)
+        delta &lt;-<span class="st"> </span>(daynum +<span class="st"> </span><span class="dv">7</span> -<span class="st"> </span>firstday) %%<span class="st"> </span><span class="dv">7</span> +<span class="st"> </span>(n<span class="dv">-1</span>)*<span class="dv">7</span>
+        <span class="kw">return</span>(Monthstart +<span class="st"> </span><span class="kw">days</span>(delta))
+    }</code></pre>
+<p>Now we're ready to put it all together. The final function will produce a simple list of the "effective"" date of the holidays. Effective date is the the actual free workday that occurs (which may be the Monday or Tuesday after the public holiday if it falls on a weekend).</p>
+<p>Unfortunately, there is an exception for ANZAC day, which does not result in a free workday if it happens to fall on a weekend. This ruling depends political rulings, so needs to be hard coded.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get list of holidays for given year</span>
+    melbhols &lt;-<span class="st"> </span>function(<span class="dt">year=</span><span class="dv">1971</span>){
+        hols &lt;-<span class="st"> </span><span class="kw">dmy</span>(<span class="kw">paste</span>( <span class="dv">1</span>,<span class="dv">1</span>, year, <span class="dt">sep=</span><span class="st">"-"</span>))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, <span class="kw">dmy</span>(<span class="kw">paste</span>( <span class="dv">26</span>,<span class="dv">1</span>, year, <span class="dt">sep=</span><span class="st">"-"</span>)))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, <span class="kw">nthday</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">3</span>,year))
+    
+        EasterSunday &lt;-<span class="st"> </span><span class="kw">dmy</span>(<span class="kw">Easter</span>(year))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, EasterSunday +<span class="st"> </span><span class="kw">ddays</span>(-<span class="dv">2</span>))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, EasterSunday +<span class="st"> </span><span class="kw">ddays</span>(<span class="dv">1</span>))
+    
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, <span class="kw">dmy</span>(<span class="kw">paste</span>(<span class="dv">25</span>,<span class="dv">4</span>,year,<span class="dt">sep=</span><span class="st">"-"</span>)))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, <span class="kw">nthday</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">6</span>,year))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, <span class="kw">nthday</span>(<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">11</span>,year))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, <span class="kw">dmy</span>(<span class="kw">paste</span>(<span class="dv">25</span>,<span class="dv">12</span>,year,<span class="dt">sep=</span><span class="st">"-"</span>)))
+        hols &lt;-<span class="st"> </span><span class="kw">c</span>(hols, <span class="kw">dmy</span>(<span class="kw">paste</span>(<span class="dv">26</span>,<span class="dv">12</span>,year,<span class="dt">sep=</span><span class="st">"-"</span>)))
+    
+        <span class="kw">names</span>(hols) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"NewYears"</span>,<span class="st">"AusDay"</span>,<span class="st">"LabourDay"</span>,<span class="st">"GoodFriday"</span>,
+                     <span class="st">"EasterMonday"</span>,<span class="st">"Anzac"</span>,<span class="st">"QueensBD"</span>,<span class="st">"CupDay"</span>,
+                     <span class="st">"Xmas"</span>,<span class="st">"BoxingDay"</span>)
+    
+        <span class="co"># adjust for holidays on weekends</span>
+        nh &lt;-<span class="st"> </span><span class="kw">length</span>(hols)
+        for(h in <span class="dv">1</span>:nh){
+            if(h !=<span class="st"> </span><span class="dv">6</span>){  <span class="co"># days in lieu, except for ANZAC</span>
+                wd &lt;-<span class="st"> </span><span class="kw">wday</span>(hols[h])
+                if(wd==<span class="dv">7</span>) hols[h] &lt;-<span class="st"> </span>hols[h] +<span class="st"> </span><span class="kw">ddays</span>(<span class="dv">2</span>)
+                if(wd==<span class="dv">1</span>) hols[h] &lt;-<span class="st"> </span>hols[h] +<span class="st"> </span><span class="kw">ddays</span>(<span class="dv">1</span>)
+            }
+        }
+        if(hols[nh]==hols[nh<span class="dv">-1</span>]) hols[nh] &lt;-<span class="st"> </span>hols[nh] +<span class="st"> </span><span class="kw">ddays</span>(<span class="dv">1</span>)
+        
+        <span class="kw">return</span>(<span class="kw">format</span>(<span class="kw">as.Date</span>(hols),<span class="st">"%d-%m-%Y"</span>))
+    }</code></pre>
+<p>So, for 2015 the public holidays are as follows:</p>
+<pre class="sourceCode r"><code class="sourceCode r">    <span class="kw">melbhols</span>(<span class="dv">2015</span>)</code></pre>
+<pre><code>##     NewYears       AusDay    LabourDay   GoodFriday EasterMonday 
+## "01-01-2015" "26-01-2015" "09-03-2015" "03-04-2015" "06-04-2015" 
+##        Anzac     QueensBD       CupDay         Xmas    BoxingDay 
+## "25-04-2015" "08-06-2015" "03-11-2015" "25-12-2015" "28-12-2015"</code></pre>
+<div class="references">
+
+</div>
+
+]]></content:encoded></item></channel></rss>
