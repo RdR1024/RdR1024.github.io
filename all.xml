@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Richard de Rozario</title><link>http://richardderozario.org/</link><description>Living the analytics life in Melbourne</description><item><title>About me</title><link>http://richardderozario.org/posts/AboutMe/AboutMe.html</link><guid>http://richardderozario.org/posts/AboutMe/AboutMe.html</guid><pubDate>Sat, 01 Jan 2011 00:00:00 AEDT</pubDate><description></description><content:encoded><![CDATA[
+<rss xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>Richard de Rozario</title><link>http://richardderozario.org/</link><description>Living the analytics life in Melbourne</description><item><title>About me</title><link>http://richardderozario.org/posts/AboutMe/AboutMe.html</link><guid>http://richardderozario.org/posts/AboutMe/AboutMe.html</guid><pubDate>Sat, 01 Jan 2011 00:00:00 +1100</pubDate><description></description><content:encoded><![CDATA[
 <div id="header">
 <h1 class="title">About me</h1>
 </div>
@@ -8,7 +8,7 @@
 <div class="references">
 
 </div>
-]]></content:encoded></item><item><title>The Completeness of Categories</title><link>http://richardderozario.org/posts/CompletenessOfCategories/CompletenessOfCategories.html</link><guid>http://richardderozario.org/posts/CompletenessOfCategories/CompletenessOfCategories.html</guid><pubDate>Wed, 14 Jan 2015 00:00:00 AEDT</pubDate><description>Calculating how many categories are needed to reach a certain confidence level, based on some simplified assumptions.</description><content:encoded><![CDATA[
+]]></content:encoded></item><item><title>The Completeness of Categories</title><link>http://richardderozario.org/posts/CompletenessOfCategories/CompletenessOfCategories.html</link><guid>http://richardderozario.org/posts/CompletenessOfCategories/CompletenessOfCategories.html</guid><pubDate>Wed, 14 Jan 2015 00:00:00 +1100</pubDate><description>Calculating how many categories are needed to reach a certain confidence level, based on some simplified assumptions.</description><content:encoded><![CDATA[
 <div id="header">
 <h1 class="title">The Completeness of Categories</h1>
 <h3 class="date">2015-01-14</h3>
@@ -43,7 +43,7 @@
 <li id="fn2"><p>As always, there is a caveat here: if the process that generates the categories does <em>not</em> generate an arbitrary (that is, randomly distributed) set of categories, then the analysis doesn't hold. So, we may have to take steps to counter the "bias"" in the process. Note that for the purposes of covering the "most material" magnitude, the counter need only be in one direction. So, for example we may deliberately chose a high threshold to begin the analysis.<a href="#fnref2"><U+21A9></a></p></li>
 </ol></div>
 
- ]]></content:encoded></item><item><title>K-ary tree level probability</title><link>http://richardderozario.org/posts/karyl/karyl.html</link><guid>http://richardderozario.org/posts/karyl/karyl.html</guid><pubDate>Sat, 07 Feb 2015 00:00:00 AEDT</pubDate><description>probability distribution of k-ary tree levels, with application for hierarchical processes.</description><content:encoded><![CDATA[
+ ]]></content:encoded></item><item><title>K-ary tree level probability</title><link>http://richardderozario.org/posts/karyl/karyl.html</link><guid>http://richardderozario.org/posts/karyl/karyl.html</guid><pubDate>Sat, 07 Feb 2015 00:00:00 +1100</pubDate><description>probability distribution of k-ary tree levels, with application for hierarchical processes.</description><content:encoded><![CDATA[
 <div id="header">
 <h1 class="title">K-ary tree level probability</h1>
 <h3 class="date">2015-02-07</h3>
@@ -84,7 +84,7 @@ Note that the probability functions range over the number of levels in a tree, w
 <p>Soetaert, Karline. 2009. "R Package Diagram: Visualising Simple Graphs, Flowcharts, and Webs." software library; CRAN.</p>
 </div>
 
-]]></content:encoded></item><item><title>Melbourne Holidays</title><link>http://richardderozario.org/posts/MelbourneHolidays/MelbourneHolidays.html</link><guid>http://richardderozario.org/posts/MelbourneHolidays/MelbourneHolidays.html</guid><pubDate>Sun, 01 Feb 2015 00:00:00 AEDT</pubDate><description>How to calculate the public holidays of a given year for Melbourne, Australia</description><content:encoded><![CDATA[
+]]></content:encoded></item><item><title>Melbourne Holidays</title><link>http://richardderozario.org/posts/MelbourneHolidays/MelbourneHolidays.html</link><guid>http://richardderozario.org/posts/MelbourneHolidays/MelbourneHolidays.html</guid><pubDate>Sun, 01 Feb 2015 00:00:00 +1100</pubDate><description>How to calculate the public holidays of a given year for Melbourne, Australia</description><content:encoded><![CDATA[
 <div id="header">
 <h1 class="title">Melbourne Holidays</h1>
 <h3 class="date">2015-02-01</h3>
@@ -157,7 +157,7 @@ Note that the probability functions range over the number of levels in a tree, w
 
 </div>
 
-]]></content:encoded></item><item><title>The Annual March</title><link>http://richardderozario.org/posts/TheAnnualMarch/TheAnnualMarch.html</link><guid>http://richardderozario.org/posts/TheAnnualMarch/TheAnnualMarch.html</guid><pubDate>Sat, 21 Jun 2014 00:00:00 AEST</pubDate><description>Happy birthday to Melbourne’s first quant, Georg von Neumayer</description><content:encoded><![CDATA[
+]]></content:encoded></item><item><title>The Annual March</title><link>http://richardderozario.org/posts/TheAnnualMarch/TheAnnualMarch.html</link><guid>http://richardderozario.org/posts/TheAnnualMarch/TheAnnualMarch.html</guid><pubDate>Sat, 21 Jun 2014 00:00:00 +1000</pubDate><description>Happy birthday to Melbourne’s first quant, Georg von Neumayer</description><content:encoded><![CDATA[
 <div id="header">
 <h1 class="title">The Annual March</h1>
 <h3 class="date">2014-06-21</h3>
@@ -190,7 +190,7 @@ Note that the probability functions range over the number of levels in a tree, w
 <li id="fn3"><p>M.L.A. (1858, Aug 11) "<a href="http://trove.nla.gov.au/ndp/del/article/7299088?searchTerm=neumayer&amp;searchLimits=exactPhrase|||anyWords|||notWords|||requestHandler|||dateFrom=1858-08-11|||dateTo=1858-08-11|||l-advtitle=13|||l-advcategory=Article|||sortby">Professor Neumayer's observations</a>.", <a href="http://en.wikipedia.org/wiki/The_Argus_%28Melbourne%29">The Argus</a>, Melbourne<a href="#fnref3"><U+21A9></a></p></li>
 </ol></div>
 
-]]></content:encoded></item><item><title>The value of advice</title><link>http://richardderozario.org/posts/ValueOfAdvice/ValueOfAdvice.html</link><guid>http://richardderozario.org/posts/ValueOfAdvice/ValueOfAdvice.html</guid><pubDate>Thu, 22 Jan 2015 00:00:00 AEDT</pubDate><description>overview of state of research on decision support over the last decade</description><content:encoded><![CDATA[
+]]></content:encoded></item><item><title>The value of advice</title><link>http://richardderozario.org/posts/ValueOfAdvice/ValueOfAdvice.html</link><guid>http://richardderozario.org/posts/ValueOfAdvice/ValueOfAdvice.html</guid><pubDate>Thu, 22 Jan 2015 00:00:00 +1100</pubDate><description>overview of state of research on decision support over the last decade</description><content:encoded><![CDATA[
 <div id="header">
 <h1 class="title">The value of advice</h1>
 <h3 class="date">2015-01-22</h3>
