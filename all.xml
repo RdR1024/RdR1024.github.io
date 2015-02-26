@@ -52,7 +52,7 @@
 <p>The context is a hierarchy, like an area of business operations, with processes that are hierarchically organised. That is, the bottom level is the processing of transactions, but then there are higher level processes that affect the transaction process. For example, setting fees across groups of transactions. Then there are even higher level processes, say, setting the criteria for market segments, within which we might have different groups of fees.</p>
 <p>Now imagine that events can happen across the area at random. That means sometimes the event will touch a transaction at the bottom level, but sometimes at a higher level. If the event occurs at a higher level, then that will affect multiple transactions at the bottom level. So, what I want to know is, what is the probability that an event will happen at a particular level, and how many bottom level transactions will be affected by that event?</p>
 A simple model with a fixed number of lower level transactions enables us to calculate the probability that a given number of transactions are affected.<br /><figure><center>
-<img title="plot of chunk simple_tree" alt="plot of chunk simple_tree" width="288" src="http://richardderozario.org/posts/posts/karyl/figure/simple_tree-1.png" /><figcaption><em>Figure 1. Simple process hierarchy as a k-ary tree. Bottom nodes are individual transactions affected.</em>
+<img title="plot of chunk simple_tree" alt="plot of chunk simple_tree" width="288" src="http://richardderozario.org/posts/karyl/figure/simple_tree-1.png" /><figcaption><em>Figure 1. Simple process hierarchy as a k-ary tree. Bottom nodes are individual transactions affected.</em>
 </figcaption></center>
 </figure><p>Using the <em>diagram</em> package <span class="citation">(Soetaert 2009)</span>, I have drawn a <a href="http://en.wikipedia.org/wiki/Hasse_diagram">Hasse</a> diagram in <em>Figure 1</em> of a small example hierarchy of 13 possible events, some of which are higher level, which means they affect multiple lower-level transactions. In this example, it's easy to see that there are 4 possible events where more than a single transaction is affected. This type of hierarchy is called an <a href="http://en.wikipedia.org/wiki/K-ary_tree">k-ary tree</a>. For the purpose of estimating the number of transactions affected by a higher level event, we can turn the tree into a a probability function.</p>
 <p>A convenient form of the probability function is the probability that a node is on a particular level, given a fixed group size (the number of nodes belonging to a direct parent node) and the maximum number of levels. To derive the probability mass function, we use the formula that calculates the total number of nodes in the tree (N), where <span class="math">\(L\)</span> is the maximum level, starting from zero at the top node, and <span class="math">\(g\)</span> is the group size:</p>
@@ -78,7 +78,7 @@ Note that the probability functions range over the number of levels in a tree, w
 <figure><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">rkaryl</span>(<span class="fl">1e3</span>,<span class="dv">10</span>,<span class="dv">5</span>)
 <span class="kw">hist</span>(x,<span class="dt">main=</span><span class="st">"k-ary tree level probability mass"</span>,
      <span class="dt">xlab=</span><span class="st">"level"</span>,<span class="dt">col=</span><span class="st">"grey"</span>,<span class="dt">xlim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">10</span>))</code></pre>
-<img src="http://richardderozario.org/posts/posts/karyl/figure/example-1.png" /><figcaption><em>Figure 2. histogram of k-ary level probability density with max level of 10 and groups of 5.</em>
+<img src="http://richardderozario.org/posts/karyl/figure/example-1.png" /><figcaption><em>Figure 2. histogram of k-ary level probability density with max level of 10 and groups of 5.</em>
 </figcaption></figure><p><em>Bibliography</em></p>
 <div class="references">
 <p>Soetaert, Karline. 2009. "R Package Diagram: Visualising Simple Graphs, Flowcharts, and Webs." software library; CRAN.</p>
@@ -156,6 +156,240 @@ Note that the probability functions range over the number of levels in a tree, w
 <div class="references">
 
 </div>
+
+]]></content:encoded></item><item><title>A mini blog generator in R with knitr and pandoc</title><link>http://richardderozario.org/posts/miniblog/miniblog.html</link><guid>http://richardderozario.org/posts/miniblog/miniblog.html</guid><pubDate>Wed, 25 Feb 2015 00:00:00 +1100</pubDate><description>How to implement a mini blog site generator using R and pandoc. Only html and file folder structure is used to create and maintain a static blog for hosting on sites like GitHub. Aside from speed and simplicity, the advantage is that you can publish directly from R-markdown text.</description><content:encoded><![CDATA[
+<div id="header">
+<h1 class="title">A mini blog generator in R with knitr and pandoc</h1>
+<h3 class="date">2015-02-25</h3>
+</div>
+<p>When I started blogging about analytics (and R), I went looking for a blogging platform that would allow me to easily post directly from R-markdown. However, the typical choices like Wordpress didn't work well in that regard. I still had to copy, paste and edit the posts, because neither the markdown nor html features from extended markdown were well supported.</p>
+<p>The solution pointed in the direction of "static blog generators". These (re-)generate the blog as a set of ordinary html pages, which can then be hosted on places like <a href="https://github.com/">GitHub</a>. This means that you can just generate a html page from an R-markdown page, with something like <a href="http://johnmacfarlane.net/pandoc/">pandoc</a>, save it in a folder, and sync the blog page with the host site. Writing a blog becomes almost seamless with writing some literate R.</p>
+<p>I couldn't find a simple blog generator written in R, so I wrote one.</p>
+<p>So, this rather long blog documents a mini blog generator, written completely in R. The individual blog pages can be standalone html documents, like those generated by <a href="http://yihui.name/knitr/">knitr</a> and pandoc from R-markdown text. Each blog post consists of a folder that contains the html page, with a sub-folder for any graphics. The folder may also contain other files, which are ignored by the blog, but enables the folder to be a complete project folder, such as generated by <a href="http://www.rstudio.com/">RStudio</a>. The only restriction is the naming convention that the folder has the same name (minus extension) as the html page that contains the posting. So, an example structure of folders and files might be as follows:</p>
+<figure><img src="http://richardderozario.org/posts/miniblog/figure/FolderStructure.png" /><br /><figcaption><em>Figure 1: example folder structure for the blog</em>
+</figcaption></figure><p>In the example, the top folder<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> is called <code>username.github.io</code>. That is what you would choose for the top folder name, if you hosted your site using GitHub. That is, when you create an account on GitHub, you would also create a repository named <em>username.github.io</em><a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> to host your blog, and that would automatically create a local folder by that name. If you do not host on GitHub, you may call the (local) folder anything you like.</p>
+<p>The top folder also contains one essential file: <code>index.html</code>. This is just a straightforward html file, without any special "micro-templating" or "macros". The miniblog generator that I'll describe later simply updates this file whenever changes are made in the folders containing posts. Moreover, the generator only touches specific sections of the html, so you're free to get creative with the other parts of the html. That way, you can style the layout of the blog site as you please.</p>
+<p>One part that the blog generator changes in the html is the <code>iframe</code> that contains the front page article. This section looks like the following:</p>
+<pre><code>
+    &lt;!-- front page article --&gt;
+    &lt;iframe name="frontpost" class="frontpost" scrolling="auto" 
+    frameborder="NO" src="posts/FirstArticle/FirstArticle.html"&gt;&lt;/iframe&gt;
+</code></pre>
+<p>The generator replaces the <code>src</code> content to the html file of the last article that was updated. Similarly, the generator replaces the links <code>&lt;a...</code> links in the following section:</p>
+<pre><code>
+    &lt;!-- links to articles --&gt;
+    &lt;div class="articles"&gt;
+    
+    &lt;a href="posts/FirstArticle/FirstArticle.html"
+    target="frontpost"&gt;FirstArticle&lt;/a&gt;&lt;br&gt;
+    
+    &lt;a href="posts/SecondArticle/SecondArticle.html"
+    target="frontpost"&gt;SecondArticle&lt;/a&gt;&lt;br&gt;
+    ...
+    ...
+    &lt;/div&gt;
+</code></pre>
+<p>That's it as far as the blog structure is concerned. An index.html file in the top folder and a sub-folder called "posts" that in turn contains a folder for each article. Articles are just html files that can be produced from something like an R-markdown text.</p>
+<p>Now, onto the R-code that generates the blog site. Firstly, we require the XML libraries to handle the html files.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">require</span>(<span class="st">"XML"</span>,<span class="dt">quietly=</span><span class="ot">TRUE</span>)
+<span class="kw">require</span>(<span class="st">"selectr"</span>,<span class="dt">quietly=</span><span class="ot">TRUE</span>)</code></pre>
+<p>Next is the function that "re-indexes" the front page. By that I mean, we want to scan all the articles in the <code>posts</code> folder and create the links for them in the <code>index.html</code> page. We also want to update the link for the front page article. The list of article links will be in order of last update.</p>
+<p>The first parameter of the reindex function is the path to the top folder &mdash; that is, the folder where <code>index.html' lives.  In our example above, that might be something like</code>c:/GitHub/username.github.io/<code>.  The next parameter is the base URL that you would put in a browser to visit the blog -- for example,</code>http://username.github.io/`. The last parameter allows you to pass a metadata list &mdash; more about that later.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># recreate index.html with updated article list</span>
+<span class="co"># assumes the path points to a folder structure</span>
+<span class="co"># that adheres to the miniblog naming convention</span>
+reindex &lt;-<span class="st"> </span>function(<span class="dt">path=</span><span class="st">"./"</span>,<span class="dt">base=</span><span class="st">""</span>,<span class="dt">meta=</span><span class="ot">NA</span>){
+    docpath &lt;-<span class="st"> </span><span class="kw">paste</span>(path,<span class="st">"index.html"</span>,<span class="dt">sep=</span><span class="st">""</span>)
+
+    if(<span class="kw">file.exists</span>(docpath)){
+        doc &lt;-<span class="st"> </span><span class="kw">htmlParse</span>(docpath)
+
+        <span class="co"># get sorted article metadata</span>
+    if(<span class="kw">typeof</span>(meta)!=<span class="st">"list"</span>) 
+        meta &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(
+            <span class="kw">metadata</span>(<span class="kw">paste</span>(path,<span class="st">"posts/"</span>,<span class="dt">sep=</span><span class="st">""</span>),
+                     <span class="kw">paste</span>(base,<span class="st">"posts/"</span>,<span class="dt">sep=</span><span class="st">""</span>)
+            )
+        )
+        p &lt;-<span class="st"> </span><span class="kw">order</span>(meta$mdate,<span class="dt">decreasing=</span><span class="ot">TRUE</span>)
+
+        <span class="co"># replace links to articles</span>
+        articles &lt;-<span class="st"> </span><span class="kw">querySelector</span>(doc,<span class="st">"div .articles"</span>)
+        <span class="kw">removeNodes</span>(<span class="kw">xmlChildren</span>(articles))
+        for(i in p){
+            a &lt;-<span class="st"> </span><span class="kw">newXMLNode</span>(<span class="st">"a"</span>, <span class="kw">newXMLTextNode</span>(meta$post[i]), <span class="dt">attrs=</span><span class="kw">c</span>(
+                    <span class="dt">href=</span> <span class="kw">paste</span>(<span class="st">"posts/"</span>,meta$relpath[i],<span class="dt">sep=</span><span class="st">""</span>),
+                    <span class="dt">target=</span><span class="st">"frontpost"</span>
+                    )
+                 )
+            <span class="kw">addChildren</span>(articles,a)
+            <span class="kw">addChildren</span>(articles,<span class="kw">newXMLNode</span>(<span class="st">"br"</span>))
+        }
+        
+        <span class="co"># repoint front page article</span>
+        f &lt;-<span class="st"> </span><span class="kw">querySelector</span>(doc,<span class="st">".frontpost"</span>)
+        <span class="kw">removeAttributes</span>(f,<span class="dt">.attrs=</span><span class="st">"src"</span>)
+        <span class="kw">addAttributes</span>(f,<span class="dt">src=</span><span class="kw">paste</span>(<span class="st">"posts/"</span>,meta$relpath[p[<span class="dv">1</span>]],<span class="dt">sep=</span><span class="st">""</span>))
+    } else <span class="kw">warning</span>(<span class="kw">paste</span>(<span class="st">"Index file does not exist: "</span>, docpath,<span class="dt">sep=</span><span class="st">""</span>))
+    <span class="kw">return</span>(doc)
+}</code></pre>
+<p>The function that gathers all the information about the articles is called <code>metadata()</code>. It gets a list of all the article folders in <code>posts</code> and then loops through them. In each folder it sucks in the html document and gathers all the meta data fields in the html header. It also checks the last modification date of the file, so that we can sort later by "latest update". Finally, we also include the entire body of the html page, which is the content of the article. That's where the most processing happens, because we have to replace the local image links with a full http reference, so that the content can stand alone from the location we gathered it from. Due to the transformations by the XML library functions, we also have to clean various special characters.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># function to read metadata from posts</span>
+metadata &lt;-<span class="st"> </span>function(<span class="dt">path=</span><span class="st">"./"</span>,<span class="dt">base=</span><span class="st">""</span>){
+    <span class="co"># create a structure to hold info</span>
+    meta &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">post=</span><span class="st">""</span>, <span class="dt">relpath=</span><span class="st">""</span>, <span class="dt">mdate=</span><span class="dv">0</span>, <span class="dt">title=</span><span class="st">""</span>, 
+                 <span class="dt">author=</span><span class="st">""</span>,<span class="dt">date=</span><span class="st">""</span>, <span class="dt">description=</span><span class="st">""</span>, <span class="dt">keywords=</span><span class="st">""</span>,
+                 <span class="dt">content=</span><span class="st">""</span>)
+                
+    <span class="co"># get list of post html files</span>
+    dirs &lt;-<span class="st"> </span><span class="kw">list.dirs</span>(path,<span class="dt">recursive=</span><span class="ot">FALSE</span>,<span class="dt">full.names=</span><span class="ot">FALSE</span>)
+    postpaths &lt;-<span class="st"> </span><span class="kw">paste</span>(dirs,<span class="st">"/"</span>,dirs,<span class="st">".html"</span>,<span class="dt">sep=</span><span class="st">''</span>)
+    postfullpaths &lt;-<span class="st"> </span><span class="kw">paste</span>(path,postpaths,<span class="dt">sep=</span><span class="st">''</span>)
+    
+    <span class="co"># extract meta data from each file</span>
+    for(i in <span class="dv">1</span>:<span class="kw">length</span>(postfullpaths)){
+        if(<span class="kw">file.exists</span>(postfullpaths[i])){
+            meta$post[i] &lt;-<span class="st"> </span>dirs[i]
+            meta$relpath[i] &lt;-<span class="st"> </span>postpaths[i]
+            meta$mdate[i] &lt;-<span class="st"> </span><span class="kw">file.info</span>(postfullpaths[i])$mtime 
+            doc &lt;-<span class="st"> </span><span class="kw">htmlParse</span>(postfullpaths[i])
+            <span class="kw">absolurl</span>(doc,<span class="dt">base=</span><span class="kw">paste</span>(base,dirs[i],<span class="st">"/"</span>,<span class="dt">sep=</span><span class="st">""</span>))
+            xvalue &lt;-<span class="st"> </span><span class="kw">querySelector</span>(doc,<span class="st">"title"</span>)
+            if(!<span class="kw">is.null</span>(xvalue)) meta$title[i] &lt;-<span class="st"> </span><span class="kw">xmlValue</span>(xvalue)
+            meta$author[i] &lt;-<span class="st"> </span><span class="kw">metaval</span>(doc,<span class="st">"author"</span>)
+            meta$date[i] &lt;-<span class="st"> </span><span class="kw">metaval</span>(doc,<span class="st">"date"</span>)
+            meta$description[i] &lt;-<span class="st"> </span><span class="kw">metaval</span>(doc,<span class="st">"description"</span>)
+            meta$keywords[i] &lt;-<span class="st"> </span><span class="kw">metaval</span>(doc,<span class="st">"keywords"</span>)
+            
+            <span class="co"># extract a clean-ish copy of the content</span>
+            body &lt;-<span class="st"> </span><span class="kw">toString.XMLNode</span>(<span class="kw">querySelector</span>(doc,<span class="st">"body"</span>))
+            body &lt;-<span class="st"> </span><span class="kw">substr</span>(body,<span class="dv">7</span>,<span class="kw">nchar</span>(body)-<span class="dv">8</span>)
+            body &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">"&amp;#13;"</span>,<span class="st">""</span>,body)
+            body &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">"</span><span class="ch">\x92</span><span class="st">"</span>,<span class="st">"'"</span>,body)
+            body &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">"[</span><span class="ch">\x93</span><span class="st">-</span><span class="ch">\x94</span><span class="st">]"</span>,<span class="st">'"'</span>,body)
+            body &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">"</span><span class="ch">\x96</span><span class="st">"</span>,<span class="st">'&amp;mdash;'</span>,body)
+            body &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">"</span><span class="ch">\x85</span><span class="st">"</span>,<span class="st">'&amp;#8230;'</span>,body)
+            body &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">"[</span><span class="ch">\x7f</span><span class="st">-</span><span class="ch">\xff</span><span class="st">]"</span>,<span class="st">' '</span>,body)
+            g &lt;-<span class="st"> </span><span class="kw">regexpr</span>(<span class="st">"&lt;!--DISQUS"</span>,body)[<span class="dv">1</span>] -<span class="st"> </span><span class="dv">1</span>
+            if(g&gt;<span class="dv">0</span>) body &lt;-<span class="st"> </span><span class="kw">substr</span>(body,<span class="dv">1</span>,g)
+            meta$content[i] &lt;-<span class="st"> </span>body
+        }
+    }
+    <span class="kw">return</span>(meta)    
+}</code></pre>
+<p>The metadata function uses a special helper function for obtaining the value of a metadata field. That's shown below.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># get a single metadata value</span>
+metaval &lt;-<span class="st"> </span>function(xdoc,meta){
+            r &lt;-<span class="st"> ""</span>
+            xvalue &lt;-<span class="st"> </span><span class="kw">querySelector</span>(xdoc,<span class="kw">paste</span>(<span class="st">"meta[name="</span>,meta,<span class="st">"]"</span>,<span class="dt">sep=</span><span class="st">""</span>))
+            if(!<span class="kw">is.null</span>(xvalue)) r &lt;-<span class="st"> </span><span class="kw">xmlGetAttr</span>(xvalue,<span class="st">"content"</span>,<span class="dt">default=</span><span class="st">""</span>)
+            <span class="kw">return</span>(r)
+}</code></pre>
+<p>The metadata function also grabs the content of the html page, which anticipates that we might want to generate an rss feed. However, the contents may contain relative links, for example to images. These links neeed to be made into absolute urls (i.e with full http path). The function below takes care of the main links. Essentially, it prefixes the base URL to the relative link in the attribute of the html tag.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># convert links in an xml node like &lt;body&gt; to </span>
+<span class="co"># absolute references, using a base url</span>
+absolurl &lt;-<span class="st"> </span>function(xml,<span class="dt">base=</span><span class="st">""</span>){
+    if(<span class="kw">substr</span>(base,<span class="kw">nchar</span>(base),<span class="kw">nchar</span>(base)) !=<span class="st"> "/"</span>) 
+        base &lt;-<span class="st"> </span><span class="kw">paste</span>(base,<span class="st">"/"</span>,<span class="dt">sep=</span><span class="st">""</span>)
+
+    <span class="co"># expand and link (stylesheet) references</span>
+    links &lt;-<span class="st"> </span><span class="kw">querySelectorAll</span>(xml,<span class="st">"link"</span>)
+    for(i in links){
+        link &lt;-<span class="st"> </span><span class="kw">xmlGetAttr</span>(i,<span class="st">"href"</span>,<span class="dt">default=</span><span class="st">""</span>)
+        if(link !=<span class="st"> ""</span> &amp;<span class="st"> </span><span class="kw">substr</span>(link,<span class="dv">1</span>,<span class="dv">4</span>) !=<span class="st"> "http"</span>){
+            <span class="kw">removeAttributes</span>(i,<span class="dt">.attrs=</span><span class="st">"href"</span>)
+            <span class="kw">addAttributes</span>(i,<span class="dt">href=</span><span class="kw">paste</span>(base,link,<span class="dt">sep=</span><span class="st">""</span>))
+        }
+    }
+
+    <span class="co"># expand img links to absolute references</span>
+    imgs &lt;-<span class="st"> </span><span class="kw">querySelectorAll</span>(xml,<span class="st">"img"</span>)
+    for(i in imgs){
+        link &lt;-<span class="st"> </span><span class="kw">xmlGetAttr</span>(i,<span class="st">"src"</span>,<span class="dt">default=</span><span class="st">""</span>)
+        if(link !=<span class="st"> ""</span> &amp;<span class="st"> </span><span class="kw">substr</span>(link,<span class="dv">1</span>,<span class="dv">4</span>) !=<span class="st"> "http"</span>){
+            <span class="kw">removeAttributes</span>(i,<span class="dt">.attrs=</span><span class="st">"src"</span>)
+            <span class="kw">addAttributes</span>(i,<span class="dt">src=</span><span class="kw">paste</span>(base,link,<span class="dt">sep=</span><span class="st">""</span>))
+        }
+    }
+    
+    <span class="co"># expand a a-links that do not have https or # prefix</span>
+    anchors &lt;-<span class="st"> </span><span class="kw">querySelectorAll</span>(xml,<span class="st">"a"</span>)
+    for(i in anchors){
+        link &lt;-<span class="st"> </span><span class="kw">xmlGetAttr</span>(i,<span class="st">"href"</span>,<span class="dt">default=</span><span class="st">""</span>)
+        if(link !=<span class="st"> ""</span> &amp;<span class="st"> </span><span class="kw">substr</span>(link,<span class="dv">1</span>,<span class="dv">4</span>) !=<span class="st"> "http"</span> 
+           &amp;<span class="st"> </span><span class="kw">substr</span>(link,<span class="dv">1</span>,<span class="dv">1</span>) !=<span class="st">"#"</span>){
+            <span class="kw">removeAttributes</span>(i,<span class="dt">.attrs=</span><span class="st">"href"</span>)
+            <span class="kw">addAttributes</span>(i,<span class="dt">src=</span><span class="kw">paste</span>(base,link,<span class="dt">sep=</span><span class="st">""</span>))
+        }
+    }
+}</code></pre>
+<p>Once we have all the meta-data, it's relatively simple to generate an rss xml file. To take care of the xml pre-amble, we'll just read a template file (or an existing rss file if it exists). Then, for each item in the meta data list, we'll generate an xml node called <code>&lt;item&gt;</code>, which is how rss stores the article data. Note that if the metadata isn't passed as a parameter, then we construct it within the <code>rssupdate</code> function, using the <code>path</code> and <code>base</code> parameters. This gives some flexibility to use the <code>rssupdate</code> function standalone, or as part of a larger process where we don't want to duplicate reading the metadata.</p>
+<p>Finally, the <code>rssupdate</code> function also allows for a rudimentary filtering on a keyword. This is useful if you want to create an rss feed for articles that contain a specific keyword. For example, if you put "R-code" as a keyword in your articles that contain R, you can then create a feed for <a href="http://www.r-bloggers.com/">R-bloggers</a>.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># create rss feed</span>
+rssupdate &lt;-<span class="st"> </span>function(filename,<span class="dt">meta=</span><span class="ot">NA</span>,<span class="dt">path=</span><span class="ot">NA</span>,<span class="dt">base=</span><span class="st">""</span>,<span class="dt">keyword=</span><span class="ot">NA</span>){
+    <span class="co"># get sorted post metadata</span>
+    if(<span class="kw">typeof</span>(meta)!=<span class="st">"list"</span>) 
+        meta &lt;-<span class="st"> </span><span class="kw">metadata</span>(<span class="kw">paste</span>(path,<span class="st">"posts/"</span>,<span class="dt">sep=</span><span class="st">""</span>),<span class="dt">base=</span>base)
+    meta &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(meta)
+    if(!<span class="kw">is.na</span>(keyword)) p &lt;-<span class="st"> </span><span class="kw">which</span>(<span class="kw">grepl</span>(keyword,meta$keywords))
+    else p &lt;-<span class="st"> </span><span class="dv">1</span>:<span class="kw">nrow</span>(meta)
+    
+    <span class="co"># rss preamble</span>
+    doc &lt;-<span class="st"> </span><span class="kw">xmlParse</span>(<span class="kw">paste</span>(path,filename,<span class="dt">sep=</span><span class="st">""</span>))
+    url &lt;-<span class="st"> </span><span class="kw">xmlValue</span>(<span class="kw">querySelector</span>(doc,<span class="st">"link"</span>))
+    if(<span class="kw">substr</span>(url,<span class="kw">nchar</span>(url),<span class="kw">nchar</span>(url)) !=<span class="st"> "/"</span>) url &lt;-<span class="st"> </span><span class="kw">paste</span>(url,<span class="st">"/"</span>,<span class="dt">sep=</span><span class="st">""</span>)
+    
+    channel &lt;-<span class="st"> </span><span class="kw">xmlParent</span>(<span class="kw">querySelector</span>(doc,<span class="st">"item"</span>))
+    <span class="kw">removeNodes</span>(<span class="kw">querySelectorAll</span>(doc,<span class="st">"item"</span>))
+    
+    <span class="co"># create new item nodes</span>
+    for(i in p){
+        a &lt;-<span class="st"> </span><span class="kw">newXMLNode</span>(<span class="st">"item"</span>)
+        title &lt;-<span class="st"> </span><span class="kw">newXMLNode</span>(<span class="st">"title"</span>, <span class="kw">newXMLTextNode</span>(meta$title[i]))
+        link &lt;-<span class="st"> </span><span class="kw">newXMLNode</span>(<span class="st">"link"</span>, <span class="kw">newXMLTextNode</span>(
+            <span class="kw">paste</span>(url,<span class="st">"posts/"</span>,meta$relpath[i],<span class="dt">sep=</span><span class="st">""</span>)
+        ))
+        guid &lt;-<span class="st"> </span><span class="kw">newXMLNode</span>(<span class="st">"guid"</span>, <span class="kw">newXMLTextNode</span>(
+            <span class="kw">paste</span>(url,<span class="st">"posts/"</span>,meta$relpath[i],<span class="dt">sep=</span><span class="st">""</span>)
+        ))
+        pubDate &lt;-<span class="st"> </span><span class="kw">newXMLNode</span>(<span class="st">"pubDate"</span>, <span class="kw">newXMLTextNode</span>(
+            <span class="kw">format</span>(<span class="kw">as.POSIXct</span>(meta$date[i]),<span class="st">"%a, %d %b %Y %H:%M:%S %z"</span>)
+        ))
+        description &lt;-<span class="st"> </span><span class="kw">newXMLNode</span>(<span class="st">"description"</span>, <span class="kw">newXMLTextNode</span>(
+            meta$description[i]
+        ))
+        content &lt;-<span class="st"> </span><span class="kw">newXMLNode</span>(<span class="st">"content:encoded"</span>, 
+            <span class="kw">newXMLTextNode</span>(meta$content[i], <span class="dt">cdata=</span><span class="ot">TRUE</span>
+        ))
+        <span class="kw">addChildren</span>(channel,a)
+        <span class="kw">addChildren</span>(a,<span class="dt">kids =</span> 
+            <span class="kw">list</span>(title,link,guid,pubDate,description,content)
+        )
+    }
+    <span class="kw">return</span>(doc)
+}</code></pre>
+<p>Finally, we use all the functions above in a "blog update" function. The function rewrites the <code>index.html</code> page and creates rss files.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># rewrite the index.html page of the blog</span>
+<span class="co"># incl. making a backup copy </span>
+blogupdate &lt;-<span class="st"> </span>function(<span class="dt">path=</span><span class="st">"./"</span>,<span class="dt">base=</span><span class="st">""</span>){
+    curdir &lt;-<span class="st"> </span><span class="kw">getwd</span>()
+    <span class="kw">setwd</span>(path)
+    <span class="kw">file.copy</span>(<span class="dt">from=</span><span class="st">"index.html"</span>,<span class="dt">to=</span><span class="st">"index.html.old"</span>,<span class="dt">overwrite=</span><span class="ot">TRUE</span>)
+    meta &lt;-<span class="st"> </span><span class="kw">metadata</span>(<span class="dt">path=</span><span class="st">"posts/"</span>,<span class="dt">base=</span><span class="kw">paste</span>(base,<span class="st">"posts/"</span>,<span class="dt">sep=</span><span class="st">""</span>))
+    doc &lt;-<span class="st"> </span><span class="kw">reindex</span>(path,<span class="dt">meta=</span>meta)
+    <span class="kw">saveXML</span>(doc,<span class="st">"index.html"</span>)
+    <span class="kw">saveXML</span>(<span class="kw">rssupdate</span>(<span class="st">"template.xml"</span>,<span class="dt">path=</span>path,<span class="dt">meta=</span>meta),<span class="st">"all.xml"</span>)
+    <span class="kw">saveXML</span>(<span class="kw">rssupdate</span>(<span class="st">"template.xml"</span>,<span class="dt">path=</span>path,<span class="dt">keyword=</span><span class="st">"R-code"</span>,<span class="dt">meta=</span>meta),<span class="st">"rcode.xml"</span>)
+    <span class="kw">setwd</span>(curdir)   
+}</code></pre>
+<p>That's it &mdash; just create literate R articles in folders underneath the <code>posts</code> folder and run the <code>blogupdate</code> function. You then need to sync your files with the host site and that depends on where you're hosting your blog. If it is on GitHub then just use the relevant <code>git</code> command like "push" (or on Windows, the <code>sync</code> button).</p>
+<div class="references">
+
+</div>
+<div class="footnotes">
+<hr /><ol><li id="fn1"><p>I'm using Windows terminology of "folders" here, of course meaning "directories" for nix fans.<a href="#fnref1"><U+21A9></a></p></li>
+<li id="fn2"><p>where <em>username</em> is your GitHub username.<a href="#fnref2"><U+21A9></a></p></li>
+</ol></div>
 
 ]]></content:encoded></item><item><title>The Annual March</title><link>http://richardderozario.org/posts/TheAnnualMarch/TheAnnualMarch.html</link><guid>http://richardderozario.org/posts/TheAnnualMarch/TheAnnualMarch.html</guid><pubDate>Sat, 21 Jun 2014 00:00:00 +1000</pubDate><description>Happy birthday to Melbourne’s first quant, Georg von Neumayer</description><content:encoded><![CDATA[
 <div id="header">
