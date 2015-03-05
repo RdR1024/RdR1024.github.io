@@ -349,4 +349,96 @@ blogupdate &lt;-<span class="st"> </span>function(<span class="dt">path=</span><
 <li id="fn2"><p>where <em>username</em> is your GitHub username.<a href="#fnref2"><U+21A9></a></p></li>
 </ol></div>
 
+]]></content:encoded></item><item><title>Sushi Train</title><link>http://richardderozario.org/posts/SushiTrain/SushiTrain.html</link><guid>http://richardderozario.org/posts/SushiTrain/SushiTrain.html</guid><pubDate>Mon, 02 Mar 2015 00:00:00 +1100</pubDate><description></description><content:encoded><![CDATA[
+<div id="header">
+<h1 class="title">Sushi Train</h1>
+<h3 class="date">2015-03-02</h3>
+</div>
+<p>We ate at the <a href="https://www.google.com.au/maps/place/Sakura+Kaiten+Sushi/@-37.812989,144.971679,15z/data=!4m2!3m1!1s0x0:0x90ab3fbe0265fb4b">Sakura Kaiten</a> sushi restaurant on Friday. It's almost a clich  that nerds like trains, so eating at a restaurant that delivers a continuous stream of delights through a rotary conveyor belt is a particular joy. I couldn't help myself, though. When V. remarked that she was waiting for her favourite crispy crab to come around, I started wondering about the analytics of the sushi train.</p>
+<p>So, you've got people sitting around this rotating stream of little dishes, and everybody just takes the dish that they want the most at that moment. Or they wait to see if what they want will appear shortly. The chefs continuously replace dishes that have been taken &mdash; and add the occasional new and different dish. What are the chances that you'll wait more than one rotation and not see your favourite?</p>
+<p>So, let's create a vector of seat positions and assign some dishes to them. We'll also maintain a list of which person (on the seat) is currently eating. At the start, nobody is eating yet. For simplicity, I will start with five seats and 10 dishes.</p>
+<pre class="sourceCode r"><code class="sourceCode r">    <span class="co"># seats and dishes</span>
+    nSeats &lt;-<span class="st"> </span><span class="dv">5</span>         <span class="co"># number of seats</span>
+    nDishes &lt;-<span class="st"> </span><span class="dv">10</span>       <span class="co"># number of dishes</span>
+    dishes &lt;-<span class="st"> </span><span class="dv">1</span>:nDishes <span class="co"># ready dishes</span>
+    
+    <span class="co"># start with preferred dishes in front of seats</span>
+    xdish &lt;-<span class="st"> </span><span class="dv">1</span>:nSeats
+    seats &lt;-<span class="st"> </span>dishes[xdish]           <span class="co"># give dishes to seat</span>
+    dishes[xdish] &lt;-<span class="st"> </span>-dishes[xdish]  <span class="co"># dishes not ready anymore</span>
+    
+    <span class="co"># who is eating?</span>
+    eating &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">0</span>,nSeats)
+    eatTime &lt;-<span class="st"> </span>nSeats               <span class="co"># eating time is one cycle</span></code></pre>
+<p>Now, every diner has preferences for the dishes. Let's for the moment say that everybody starts with the same general preferences, indicated by the dish number &mdash; one for most preferred, two for next preferred, and so on. However, once a dish has been sampled, its preference drops to last. So, we have a rotating preference list per seat.</p>
+<pre class="sourceCode r"><code class="sourceCode r">    <span class="co"># dish preference matrix</span>
+    prefs &lt;-<span class="st"> </span><span class="kw">t</span>(<span class="kw">matrix</span>(<span class="dv">1</span>:nDishes,<span class="dt">nrow=</span>nDishes,<span class="dt">ncol=</span>nSeats))
+    
+    <span class="co"># rotate a vector of e.g. preferences</span>
+    rotvec &lt;-<span class="st"> </span>function(x){ <span class="kw">c</span>(x[<span class="dv">2</span>:<span class="kw">length</span>(x)],x[<span class="dv">1</span>])}</code></pre>
+<p>Now, at each turn, if the dish in front of the seat matches the first preference for that seat, we take it and rotate our preference. We then shift the dishes along the seats. The chef sits at seat one. When a "taken" dish arrives, the chef will replace it, if a matching dish is ready. Otherwise, the chef will let the taken dish pass, but will prepare a matching dish for the next time the taken dish comes around. Making a dish takes time, so we'll keep track of that as well. For simplicity, we'll measure duration in terms of the number of dishes that pass &mdash; so a "cycle" is the length of the train (i.e. the number of seats).</p>
+<p>If a seat has taken a dish, it goes into eating mode and will skip the next <span class="math">\(n\)</span> dishes that pass by. On the other hand, if the dish in front of the seat doesn't match our first preference, then we wait for the next dish (and increase our count of the numnber of dishes that passed before we got our choice). We reseat the count if we take a dish.</p>
+<pre class="sourceCode r"><code class="sourceCode r">    <span class="co"># count of dishes passed for each seat</span>
+    passed &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">0</span>,nSeats)     <span class="co"># for each seat how long have we waited?</span>
+    genpassed &lt;-<span class="st"> </span><span class="kw">c</span>()            <span class="co"># in general, how long do we wait?</span>
+    making &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">0</span>,nDishes)    <span class="co"># which dishes are we making?</span>
+    makeTime &lt;-<span class="st"> </span>nSeats          <span class="co"># making a dish takes one cycle</span>
+    
+    
+    <span class="co"># process one turn </span>
+    turn &lt;-<span class="st"> </span>function(){
+        <span class="co"># at chef's seat</span>
+        if(seats[<span class="dv">1</span>] &lt;<span class="st"> </span><span class="dv">0</span>){ <span class="co"># there's eaten dish</span>
+            x &lt;-<span class="st"> </span><span class="kw">which</span>(dishes ==<span class="st"> </span>-seats[<span class="dv">1</span>])
+            if(<span class="kw">length</span>(x)&gt;<span class="dv">0</span>){ <span class="co"># there's a replacement ready</span>
+                seats[<span class="dv">1</span>] &lt;&lt;-<span class="st"> </span>-seats[<span class="dv">1</span>]
+                dishes[x[<span class="dv">1</span>]] &lt;&lt;-<span class="st"> </span>-dishes[x[<span class="dv">1</span>]]
+                making[x[<span class="dv">1</span>]] &lt;&lt;-<span class="st"> </span>makeTime
+            } else {    <span class="co"># there's no replacement ready</span>
+                x &lt;-<span class="st"> </span><span class="kw">which</span>(dishes ==<span class="st"> </span>seats[<span class="dv">1</span>])
+                if(<span class="kw">length</span>(x)&gt;<span class="dv">0</span>) {
+                    if(making[x[<span class="dv">1</span>]] &gt;<span class="st"> </span><span class="dv">0</span>) making[x[<span class="dv">1</span>]] &lt;&lt;-<span class="st"> </span>making[x[<span class="dv">1</span>]] -<span class="dv">1</span>
+                    else dishes[x[<span class="dv">1</span>]] &lt;&lt;-<span class="st"> </span>-dishes[x[<span class="dv">1</span>]]
+                }
+            }
+        } else {    <span class="co"># no eaten dish, but prep replacements</span>
+            x &lt;-<span class="st"> </span><span class="kw">which</span>(dishes &lt;<span class="st"> </span><span class="dv">0</span>)
+            if(<span class="kw">length</span>(x)&gt;<span class="dv">0</span>){    <span class="co"># there is a dish to prep</span>
+                if(making[x[<span class="dv">1</span>]] &gt;<span class="st"> </span><span class="dv">0</span>) making[x[<span class="dv">1</span>]] &lt;&lt;-<span class="st"> </span>making[x[<span class="dv">1</span>]] -<span class="dv">1</span>
+                else dishes[x[<span class="dv">1</span>]] &lt;&lt;-<span class="st"> </span>-dishes[x[<span class="dv">1</span>]]
+            } else {        <span class="co"># no dish to prep, but replace one</span>
+                x &lt;-<span class="st"> </span>prefs[<span class="dv">1</span>,<span class="dv">1</span>]
+                prefs[<span class="dv">1</span>,] &lt;&lt;-<span class="st"> </span><span class="kw">rotvec</span>(prefs[<span class="dv">1</span>,])
+                seats[<span class="dv">1</span>] &lt;&lt;-<span class="st"> </span>dishes[x]
+                dishes[x] &lt;&lt;-<span class="st"> </span>-dishes[x]
+            }
+        }
+        
+        <span class="co"># at diners' seats</span>
+        for(i in <span class="dv">2</span>:nSeats){
+            if(eating[i]==<span class="dv">0</span>){
+                if(seats[i] ==<span class="st"> </span>prefs[i,<span class="dv">1</span>]){ <span class="co"># yeah! preference is here</span>
+                    seats[i] &lt;&lt;-<span class="st"> </span>-seats[i]
+                    prefs[i,] &lt;&lt;-<span class="st"> </span><span class="kw">rotvec</span>(prefs[i,])
+                    genpassed &lt;&lt;-<span class="st"> </span><span class="kw">c</span>(genpassed,passed[i])
+                    passed[i] &lt;&lt;-<span class="st"> </span><span class="dv">0</span>
+                    eating[i] &lt;&lt;-<span class="st"> </span>eatTime
+                } else {                    <span class="co"># pass: not preference</span>
+                    passed[i] &lt;&lt;-<span class="st"> </span>passed[i] +<span class="st"> </span><span class="dv">1</span>
+                }
+            } else {    <span class="co"># we're eating: count it down</span>
+                eating[i] &lt;&lt;-<span class="st"> </span>eating[i] -<span class="dv">1</span> 
+            }
+        }
+        
+        <span class="co"># rotate the dishes through the seats</span>
+        seats &lt;&lt;-<span class="st"> </span><span class="kw">rotvec</span>(seats)
+    }</code></pre>
+<p>For the small number of diners and dishes, the cycle isn't very long. If we simulate a large number of turns, we would see that, on average, you would expect to wait a little bit less than one cycle to get your preferred dish. That changes quickly as the number of seats increases.</p>
+<div class="figure">
+<img src="http://richardderozario.org/posts/SushiTrain/figure/hist-1.png" /></div>
+<div class="references">
+
+</div>
+
 ]]></content:encoded></item></channel></rss>
