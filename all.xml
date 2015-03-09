@@ -8,7 +8,17 @@
 <div class="references">
 
 </div>
-]]></content:encoded></item><item><title>The Completeness of Categories</title><link>http://richardderozario.org/posts/CompletenessOfCategories/CompletenessOfCategories.html</link><guid>http://richardderozario.org/posts/CompletenessOfCategories/CompletenessOfCategories.html</guid><pubDate>Wed, 14 Jan 2015 00:00:00 +1100</pubDate><description>Calculating how many categories are needed to reach a certain confidence level, based on some simplified assumptions.</description><content:encoded><![CDATA[
+<!-- GOOGLE ANALYTICS -->
+<script><![CDATA[
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-60473518-1', 'auto');
+  ga('send', 'pageview');
+
+]]]]><![CDATA[></script>]]></content:encoded></item><item><title>The Completeness of Categories</title><link>http://richardderozario.org/posts/CompletenessOfCategories/CompletenessOfCategories.html</link><guid>http://richardderozario.org/posts/CompletenessOfCategories/CompletenessOfCategories.html</guid><pubDate>Wed, 14 Jan 2015 00:00:00 +1100</pubDate><description>Calculating how many categories are needed to reach a certain confidence level, based on some simplified assumptions.</description><content:encoded><![CDATA[
 <div id="header">
 <h1 class="title">The Completeness of Categories</h1>
 <h3 class="date">2015-01-14</h3>
@@ -42,8 +52,17 @@
 <hr /><ol><li id="fn1"><p>Borges critiques categorisation as a form of knowledge with an fictional example of a particularly silly set of categories: <em>&#8230;a certain Chinese encyclopedia entitled "Celestial Empire of benevolent Knowledge". In its remote pages it is written that the animals are divided into: (a) those that belong to the emperor, (b) embalmed ones, (c) those that are trained, (d) sucking pigs, (e) mermaids,(f) fabulous ones, (g) stray dogs, (h) those that are included in this classification, (i) those that tremble as if they were mad, (j) innumerable ones, (k) those drawn with a very fine camel's hair brush, (l) others, (m) those that have just broken a flower vase, (n) those that resemble flies from a distance.</em> <strong>Borges, J.L.</strong> (1952, p.103), "The analytical language of John Wilkins", <em>Other Inquisitions 1937-1952</em>, Souvenir Press, London, 1973<a href="#fnref1"><U+21A9></a></p></li>
 <li id="fn2"><p>As always, there is a caveat here: if the process that generates the categories does <em>not</em> generate an arbitrary (that is, randomly distributed) set of categories, then the analysis doesn't hold. So, we may have to take steps to counter the "bias"" in the process. Note that for the purposes of covering the "most material" magnitude, the counter need only be in one direction. So, for example we may deliberately chose a high threshold to begin the analysis.<a href="#fnref2"><U+21A9></a></p></li>
 </ol></div>
+<!-- GOOGLE ANALYTICS -->
+<script><![CDATA[
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
- ]]></content:encoded></item><item><title>K-ary tree level probability</title><link>http://richardderozario.org/posts/karyl/karyl.html</link><guid>http://richardderozario.org/posts/karyl/karyl.html</guid><pubDate>Sat, 07 Feb 2015 00:00:00 +1100</pubDate><description>probability distribution of k-ary tree levels, with application for hierarchical processes.</description><content:encoded><![CDATA[
+  ga('create', 'UA-60473518-1', 'auto');
+  ga('send', 'pageview');
+
+]]]]><![CDATA[></script>]]></content:encoded></item><item><title>K-ary tree level probability</title><link>http://richardderozario.org/posts/karyl/karyl.html</link><guid>http://richardderozario.org/posts/karyl/karyl.html</guid><pubDate>Sat, 07 Feb 2015 00:00:00 +1100</pubDate><description>probability distribution of k-ary tree levels, with application for hierarchical processes.</description><content:encoded><![CDATA[
 <div id="header">
 <h1 class="title">K-ary tree level probability</h1>
 <h3 class="date">2015-02-07</h3>
@@ -83,8 +102,17 @@ Note that the probability functions range over the number of levels in a tree, w
 <div class="references">
 <p>Soetaert, Karline. 2009. "R Package Diagram: Visualising Simple Graphs, Flowcharts, and Webs." software library; CRAN.</p>
 </div>
+<!-- GOOGLE ANALYTICS -->
+<script><![CDATA[
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-]]></content:encoded></item><item><title>Melbourne Holidays</title><link>http://richardderozario.org/posts/MelbourneHolidays/MelbourneHolidays.html</link><guid>http://richardderozario.org/posts/MelbourneHolidays/MelbourneHolidays.html</guid><pubDate>Sun, 01 Feb 2015 00:00:00 +1100</pubDate><description>How to calculate the public holidays of a given year for Melbourne, Australia</description><content:encoded><![CDATA[
+  ga('create', 'UA-60473518-1', 'auto');
+  ga('send', 'pageview');
+
+]]]]><![CDATA[></script>]]></content:encoded></item><item><title>Melbourne Holidays</title><link>http://richardderozario.org/posts/MelbourneHolidays/MelbourneHolidays.html</link><guid>http://richardderozario.org/posts/MelbourneHolidays/MelbourneHolidays.html</guid><pubDate>Sun, 01 Feb 2015 00:00:00 +1100</pubDate><description>How to calculate the public holidays of a given year for Melbourne, Australia</description><content:encoded><![CDATA[
 <div id="header">
 <h1 class="title">Melbourne Holidays</h1>
 <h3 class="date">2015-02-01</h3>
@@ -156,8 +184,17 @@ Note that the probability functions range over the number of levels in a tree, w
 <div class="references">
 
 </div>
+<!-- GOOGLE ANALYTICS -->
+<script><![CDATA[
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-]]></content:encoded></item><item><title>A mini blog generator in R with knitr and pandoc</title><link>http://richardderozario.org/posts/miniblog/miniblog.html</link><guid>http://richardderozario.org/posts/miniblog/miniblog.html</guid><pubDate>Wed, 25 Feb 2015 00:00:00 +1100</pubDate><description>How to implement a mini blog site generator using R and pandoc. Only html and file folder structure is used to create and maintain a static blog for hosting on sites like GitHub. Aside from speed and simplicity, the advantage is that you can publish directly from R-markdown text.</description><content:encoded><![CDATA[
+  ga('create', 'UA-60473518-1', 'auto');
+  ga('send', 'pageview');
+
+]]]]><![CDATA[></script>]]></content:encoded></item><item><title>A mini blog generator in R with knitr and pandoc</title><link>http://richardderozario.org/posts/miniblog/miniblog.html</link><guid>http://richardderozario.org/posts/miniblog/miniblog.html</guid><pubDate>Wed, 25 Feb 2015 00:00:00 +1100</pubDate><description>How to implement a mini blog site generator using R and pandoc. Only html and file folder structure is used to create and maintain a static blog for hosting on sites like GitHub. Aside from speed and simplicity, the advantage is that you can publish directly from R-markdown text.</description><content:encoded><![CDATA[
 <div id="header">
 <h1 class="title">A mini blog generator in R with knitr and pandoc</h1>
 <h3 class="date">2015-02-25</h3>
@@ -392,8 +429,17 @@ blogupdate &lt;-<span class="st"> </span>function(<span class="dt">path=</span><
 <hr /><ol><li id="fn1"><p>I'm using Windows terminology of "folders" here, of course meaning "directories" for nix fans.<a href="#fnref1"><U+21A9></a></p></li>
 <li id="fn2"><p>where <em>username</em> is your GitHub username.<a href="#fnref2"><U+21A9></a></p></li>
 </ol></div>
+<!-- GOOGLE ANALYTICS -->
+<script><![CDATA[
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-]]></content:encoded></item><item><title>Sushi Train</title><link>http://richardderozario.org/posts/SushiTrain/SushiTrain.html</link><guid>http://richardderozario.org/posts/SushiTrain/SushiTrain.html</guid><pubDate>Mon, 02 Mar 2015 00:00:00 +1100</pubDate><description></description><content:encoded><![CDATA[
+  ga('create', 'UA-60473518-1', 'auto');
+  ga('send', 'pageview');
+
+]]]]><![CDATA[></script>]]></content:encoded></item><item><title>Sushi Train</title><link>http://richardderozario.org/posts/SushiTrain/SushiTrain.html</link><guid>http://richardderozario.org/posts/SushiTrain/SushiTrain.html</guid><pubDate>Mon, 02 Mar 2015 00:00:00 +1100</pubDate><description></description><content:encoded><![CDATA[
 <div id="header">
 <h1 class="title">Sushi Train</h1>
 <h3 class="date">2015-03-02</h3>
@@ -484,8 +530,101 @@ blogupdate &lt;-<span class="st"> </span>function(<span class="dt">path=</span><
 <div class="references">
 
 </div>
+<!-- GOOGLE ANALYTICS -->
+<script><![CDATA[
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-]]></content:encoded></item><item><title>The Annual March</title><link>http://richardderozario.org/posts/TheAnnualMarch/TheAnnualMarch.html</link><guid>http://richardderozario.org/posts/TheAnnualMarch/TheAnnualMarch.html</guid><pubDate>Sat, 21 Jun 2014 00:00:00 +1000</pubDate><description>Happy birthday to Melbourne’s first quant, Georg von Neumayer</description><content:encoded><![CDATA[
+  ga('create', 'UA-60473518-1', 'auto');
+  ga('send', 'pageview');
+
+]]]]><![CDATA[></script>]]></content:encoded></item><item><title>Systemic events</title><link>http://richardderozario.org/posts/SystemicEvents/SystemicEvents.html</link><guid>http://richardderozario.org/posts/SystemicEvents/SystemicEvents.html</guid><pubDate>Mon, 09 Mar 2015 00:00:00 +1100</pubDate><description>One of the most significant things that the Basel II accord did for Operational Risk was to call attention to its heavy tailed nature. An organisation may have years of almost trivial losses, and then experience a loss event that is hundreds of times larger. This characteristic of rare and very large losses presents quite a challenge to quantitative models. Even fitting the data to heavy-tailed distributions doesn’t usually solve the problem, and most loss-distribution based models will try to model the tail events separately. However, there is not a lot of theory underneath the modelling that explains why the tail might be different. A possible explanation is hinted at in casual conversation about operational losses, namely “systemic events” – where multiple unit components (like multiple transactions, multiple customers, or multiple businesses) are affected by a single event. In this blog post, I show with some simulations that systemic events could “hide” in the tail of ordinary loss distributions. Most loss-distribution approaches do not try to capture the underlying mechanism that might explain why the tail is different. However, without representing such mechanisms, such as systemic loss events, the models are risking their validity.</description><content:encoded><![CDATA[
+<div id="header">
+<h1 class="title">Systemic events</h1>
+<h3 class="date">2015-03-09</h3>
+</div>
+<p>One of the most significant things that the Basel II accord did for Operational Risk was to call attention to its heavy tailed nature. An organisation may have years of almost trivial losses, and then experience a loss event that is hundreds of times larger. This characteristic of rare and very large losses presents quite a challenge to quantitative models. Even fitting the data to heavy-tailed distributions doesn't usually solve the problem, and most loss-distribution based models will try to model the tail events separately. However, there is not a lot of theory underneath the modelling that explains why the tail might be different.</p>
+<p>There is a lot of talk about mixture models, lack of data, correlations and so forth, but I wondered what a mechanism might be that would justify our supposition that the tail events are fundamentally different, yet intrinsically tied to the other losses. A possible explanation is hinted at in casual conversation about operational losses, namely "systemic events" &mdash; where multiple unit components (like multiple transactions, multiple customers, or multiple businesses) are affected by a single event.</p>
+<p>For example, imagine a payments process. The stream of individual transactions will experience occasional losses, typically due to keying errors or similar mistakes. However, the process is also part of a network of other processes, such as customer on-boarding, setting fee and interest rates, and so forth. In hierarchical fashion, some processes can affect multiple lower level transactions.</p>
+<p>So, what might loss distributions look like if you assume systemic effects, like a process hierarchy?</p>
+<p>Let's simulate an example, with some (I hope) reasonable assumptions. To start, assume a business process that is hierarchically organised, like the payments example above. Next, let's say that loss events (errors, frauds, interruptions, etc.) occur in the business operations at a rate of, say 360 per year, with a systemic event about 4 times a year. If an event occurs at a higher level process, then it affects multiple lower-level transactions &mdash; in effect, it becomes multiple events.</p>
+<p>We can model the systemic hierarchy using the <a href="http://richardderozario.org/posts/karyl/karyl.html">k-ary level probabilities</a> that I wrote about in an earlier post. Essentially, the k-ary hierarchy acts as an upper limit for the more random hierarchy that might exist in reality. The closest k-ary tree for our assumptions will have a group size of 100 and a maximum level of 3.</p>
+<p>Experience shows that the impacts of operational losses are typically heavy-tailed (even without systemic events). I'll chose the common lognormal distribution with a meanlog of 7 (about $1000) and standard deviation (log) of 2. For the purposes of analysis, the parameter choices don't matter, except in relation to the systemic effects (more on that later).</p>
+<p>For simplicity, we'll keep the annual rate of events a constant, although for realistic models that would also be a random variable &mdash; typically Poisson or Negative Binomially distributed. Keeping the rate of events constant allows us to focus on the impact. With the systemic modification, the impact formulation can be summarised as:</p>
+<p><span class="math">\[
+Impact = \sum^K_i X
+\]</span> where <span class="math">\(K\)</span> is a random variable following the k-rary level distribution and <span class="math">\(X\)</span> is a random variable following the log-normal distribution.</p>
+<p>We'll generate the results in a table, so that we can distinguish the systemic from single events.</p>
+<pre class="sourceCode r"><code class="sourceCode r">    <span class="kw">source</span>(<span class="st">"../karyl/karyl.R"</span>)  <span class="co"># use k-ary tree probability</span>
+    <span class="kw">set.seed</span>(<span class="dv">123</span>)   <span class="co"># make this single simulation reproducible</span>
+    
+    gsize &lt;-<span class="st"> </span><span class="dv">100</span>    <span class="co"># group size</span>
+    Lmax &lt;-<span class="st"> </span><span class="dv">3</span>       <span class="co"># max level</span>
+    nSim =<span class="st"> </span><span class="dv">30</span>*<span class="dv">12</span>    <span class="co"># one year of events</span>
+    Err &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">Impact=</span>gsize^(Lmax-<span class="kw">rkaryl</span>(nSim,Lmax,gsize)), <span class="dt">Systemic=</span><span class="ot">FALSE</span>)
+    Err$Systemic[Err$Impact&gt;<span class="dv">1</span>] &lt;-<span class="st"> </span><span class="ot">TRUE</span>
+    Err$Impact &lt;-<span class="st"> </span><span class="kw">sapply</span>(Err$Impact,function(i){<span class="kw">sum</span>(<span class="kw">rlnorm</span>(i,<span class="dt">meanlog=</span><span class="dv">7</span>,<span class="dt">sdlog=</span><span class="dv">2</span>))})</code></pre>
+<p>The distribution of the impact of the errors is easiest to see on a log-scale. In addition to the histogram, I'll draw some red vertical lines so that we can see where the systemic losses are.</p>
+<pre class="sourceCode r"><code class="sourceCode r">    <span class="co"># distribution of loss event impact</span>
+    <span class="kw">source</span>(<span class="st">"../loglabels/loglabels.R"</span>)
+    br&lt;-<span class="kw">hist</span>(<span class="kw">log</span>(Err$Impact,<span class="dv">10</span>),<span class="dt">axes=</span>F,
+        <span class="dt">main=</span><span class="st">"systemic loss effect"</span>, <span class="dt">xlab=</span><span class="st">"log of impact"</span>)$breaks
+    <span class="kw">axis</span>(<span class="dv">1</span>,<span class="dt">at=</span>br,<span class="dt">labels=</span><span class="kw">loglabels</span>(br))
+    <span class="kw">axis</span>(<span class="dv">2</span>)
+    <span class="kw">abline</span>(<span class="dt">v=</span><span class="kw">log</span>(Err$Impact[Err$Systemic==<span class="ot">TRUE</span>],<span class="dv">10</span>),<span class="dt">col=</span><span class="st">"red"</span>)</code></pre>
+<div class="figure">
+<img src="http://richardderozario.org/posts/SystemicEvents/figure/hist-1.png" /></div>
+<p>As the histogram shows, the systemic events are in the tail. You'd expect that, because impact of a systemic event is a multiple of the impact of single events. However, if the single events have a heavily skewed distribution, such as a log-normal, the expected loss of an individual transaction is usually a lot lower than the larger losses. This means that the systemic event can be expected to be a multiplication of small(er) losses, which probably means that the size of the systemic events overlaps with the tail of the individual events.</p>
+<p>Now, with relatively few systemic events that affect many (but not usually close to all) transactions, would we detect them by just looking at the historical impact data? To get a better sense of this, let's simulate many years of just single loss events, as well as years of combined single and systemic events.</p>
+<figure><pre class="sourceCode r"><code class="sourceCode r">    <span class="co"># qqplot of single and combined single &amp; systemic losses</span>
+    x &lt;-<span class="st"> </span><span class="kw">replicate</span>(<span class="dv">10000</span>, <span class="kw">sum</span>(<span class="kw">rlnorm</span>(nSim, <span class="dt">meanlog=</span><span class="dv">7</span>, <span class="dt">sdlog=</span><span class="dv">2</span> )))
+    
+    y &lt;-<span class="st"> </span><span class="kw">replicate</span>(<span class="dv">10000</span>, <span class="kw">sum</span>(<span class="kw">rlnorm</span>(
+        gsize^(Lmax-<span class="kw">rkaryl</span>(nSim,Lmax,gsize)),
+        <span class="dt">meanlog=</span><span class="dv">7</span>, <span class="dt">sdlog=</span><span class="dv">2</span>)))
+        
+    <span class="kw">qqplot</span>(x,y,
+        <span class="dt">main=</span><span class="st">"single vs. systemic &amp; single losses"</span>,
+        <span class="dt">xlab=</span><span class="st">"single losses"</span>, 
+        <span class="dt">ylab=</span><span class="st">"single &amp; systemic losses"</span>)
+        
+    <span class="kw">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>)</code></pre>
+<img src="http://richardderozario.org/posts/SystemicEvents/figure/comparison-1.png" /><figcaption><em>Figure 1. distribution comparison: qqplot of single vs. systemic &amp; single losses</em>
+</figcaption></figure><p>With a straight comparison of many years single vs. combined systemic and single loss events, we should be able to detect the difference. As <em>Figure 1</em> shows, the distributions look the same for lower value losses, but the combined distribution has more higher value losses.</p>
+<p>However, in practice there are far fewer years to compare and the annual rate of losses varies. Below is the comparison again, but now taking into account those more realistic aspects.</p>
+<figure><pre class="sourceCode r"><code class="sourceCode r">    <span class="co"># qqplot of single and combined single and systemic losses</span>
+    x &lt;-<span class="st"> </span><span class="kw">replicate</span>(<span class="dv">500</span>, <span class="kw">sum</span>(<span class="kw">rlnorm</span>(<span class="kw">rpois</span>(<span class="dv">1</span>,nSim), <span class="dt">meanlog=</span><span class="dv">7</span>, <span class="dt">sdlog=</span><span class="dv">2</span> )))
+    
+    y &lt;-<span class="st"> </span><span class="kw">replicate</span>(<span class="dv">500</span>, <span class="kw">sum</span>(<span class="kw">rlnorm</span>(
+        gsize^(Lmax-<span class="kw">rkaryl</span>(<span class="kw">rpois</span>(<span class="dv">1</span>,nSim),Lmax,gsize)),
+        <span class="dt">meanlog=</span><span class="dv">7</span>, <span class="dt">sdlog=</span><span class="dv">2</span>)))
+        
+    <span class="kw">qqplot</span>(x,y,
+        <span class="dt">main=</span><span class="st">"single vs. systemic &amp; single losses"</span>,
+        <span class="dt">xlab=</span><span class="st">"single losses"</span>, 
+        <span class="dt">ylab=</span><span class="st">"single &amp; systemic losses"</span>)
+        
+    <span class="kw">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>)</code></pre>
+<img src="http://richardderozario.org/posts/SystemicEvents/figure/comparison2-1.png" /><figcaption><em>Figure 2. qqplot of single vs. systemic &amp; single losses: less data and random rate</em>
+</figcaption></figure><p>In the case illustrated in <em>Figure 2</em>, the differences in the tail are less clear. We could well decide that the tail differences are just outliers and that the data fits a lognormal distribution of single events.</p>
+<p>The problem of sparsity of tail events (by definition) is well known and most loss-distribution models in practice try to model the tail separately. However, most loss-distribution approaches do not, as far as I know, try to capture the underlying mechanism, such as systemic loss events, that might explain why the tail is different. Without representing such mechanisms, the models are risking their validity.</p>
+<div class="references">
+
+</div>
+
+<!-- GOOGLE ANALYTICS -->
+<script><![CDATA[
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-60473518-1', 'auto');
+  ga('send', 'pageview');
+
+]]]]><![CDATA[></script>]]></content:encoded></item><item><title>The Annual March</title><link>http://richardderozario.org/posts/TheAnnualMarch/TheAnnualMarch.html</link><guid>http://richardderozario.org/posts/TheAnnualMarch/TheAnnualMarch.html</guid><pubDate>Sat, 21 Jun 2014 00:00:00 +1000</pubDate><description>Happy birthday to Melbourne’s first quant, Georg von Neumayer</description><content:encoded><![CDATA[
 <div id="header">
 <h1 class="title">The Annual March</h1>
 <h3 class="date">2014-06-21</h3>
@@ -517,8 +656,17 @@ blogupdate &lt;-<span class="st"> </span>function(<span class="dt">path=</span><
 <li id="fn2"><p>G. Neumayer (1860) <a href="http://search.slv.vic.gov.au/primo_library/libweb/action/dlDisplay.do?vid=MAIN&amp;reset_config=true&amp;docId=SLV_VOYAGER1211729">Results of the magnetical, nautical and meteorological observations made and collected at the Flagstaff Observatory, Melbourne, and at various stations in the Colony of Victoria, March, 1858 to February, 1859</a><a href="#fnref2"><U+21A9></a></p></li>
 <li id="fn3"><p>M.L.A. (1858, Aug 11) "<a href="http://trove.nla.gov.au/ndp/del/article/7299088?searchTerm=neumayer&amp;searchLimits=exactPhrase|||anyWords|||notWords|||requestHandler|||dateFrom=1858-08-11|||dateTo=1858-08-11|||l-advtitle=13|||l-advcategory=Article|||sortby">Professor Neumayer's observations</a>.", <a href="http://en.wikipedia.org/wiki/The_Argus_%28Melbourne%29">The Argus</a>, Melbourne<a href="#fnref3"><U+21A9></a></p></li>
 </ol></div>
+<!-- GOOGLE ANALYTICS -->
+<script><![CDATA[
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-]]></content:encoded></item><item><title>The value of advice</title><link>http://richardderozario.org/posts/ValueOfAdvice/ValueOfAdvice.html</link><guid>http://richardderozario.org/posts/ValueOfAdvice/ValueOfAdvice.html</guid><pubDate>Thu, 22 Jan 2015 00:00:00 +1100</pubDate><description>overview of state of research on decision support over the last decade</description><content:encoded><![CDATA[
+  ga('create', 'UA-60473518-1', 'auto');
+  ga('send', 'pageview');
+
+]]]]><![CDATA[></script>]]></content:encoded></item><item><title>The value of advice</title><link>http://richardderozario.org/posts/ValueOfAdvice/ValueOfAdvice.html</link><guid>http://richardderozario.org/posts/ValueOfAdvice/ValueOfAdvice.html</guid><pubDate>Thu, 22 Jan 2015 00:00:00 +1100</pubDate><description>overview of state of research on decision support over the last decade</description><content:encoded><![CDATA[
 <div id="header">
 <h1 class="title">The value of advice</h1>
 <h3 class="date">2015-01-22</h3>
@@ -545,5 +693,14 @@ blogupdate &lt;-<span class="st"> </span>function(<span class="dt">path=</span><
 <li id="fn2"><p>Feldman M. S. and March J. G. (1981) "Information in Organizations as Signal and Symbol", Administrative Science Quarterly, V26N2, p171-186<a href="#fnref2"><U+21A9></a></p></li>
 <li id="fn3"><p>Bonaccio, S. and Dalal R. (2006) "Advice taking and decision-making: An integrative literature review, and implications for the organizational sciences", <em>Organizational Behavior and Human Decision Processes 101</em>, p127-151<a href="#fnref3"><U+21A9></a></p></li>
 </ol></div>
+<!-- GOOGLE ANALYTICS -->
+<script><![CDATA[
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-]]></content:encoded></item></channel></rss>
+  ga('create', 'UA-60473518-1', 'auto');
+  ga('send', 'pageview');
+
+]]]]><![CDATA[></script>]]></content:encoded></item></channel></rss>
