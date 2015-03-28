@@ -62,6 +62,80 @@
   ga('create', 'UA-60473518-1', 'auto');
   ga('send', 'pageview');
 
+]]]]><![CDATA[></script>]]></content:encoded></item><item><title>Distribute an amount over bins in proportion to an arbitrary probability distribution</title><link>http://richardderozario.org/posts/distributeM/distributeM.html</link><guid>http://richardderozario.org/posts/distributeM/distributeM.html</guid><pubDate>Sat, 14 Mar 2015 00:00:00 +1100</pubDate><description>A basic method to distribute some total amount over a fixed number of bins or slots, in proportion to a probability distribution. For example, assume that you have the total assets for a number of companies, but not the individual assets. However, let’s say that you can also assume that the assets are lognormally distributed among the companies. The simple discretisation approach shown in this article will distribute the total assets across the companies in proportion to a lognormal probability distribution.</description><content:encoded><![CDATA[
+<div id="header">
+<h1 class="title">Distribute an amount over bins in proportion to an arbitrary probability distribution</h1>
+<h3 class="date">2015-03-14</h3>
+</div>
+<p>Here's a little task that I encounter repeatedly in practice: distribute a total amount among a number of components in proportion to some probability distribution. There is a simple technique for this, based on <em>discretization</em> of a probability distribution. In this article, I'll show some basic R methods to generalise a function like <code>discretize</code> to apply to an arbitrary probability distribution that we can select with a parameter.</p>
+<p>As an example of the task, imagine that you have the total assets of a number of businesses, but not the individual assets. However, with some reasonable, albeit simplifying, assumptions<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> you can also surmise that the total assets are distributed lognormally among the businesses. So, you'll want to take the total amount of assets and allocate it to the businesses so that if you were to plot the assets of each business the graph would look like a lognormal probability curve.</p>
+<p>To explain "discretization", I'll first implement an example manually. Let's arbitrarily say we have $500M in assets, to be distributed among 50 businesses.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># arbitrary example</span>
+Amount &lt;-<span class="st"> </span><span class="dv">500</span>
+N &lt;-<span class="st"> </span><span class="dv">51</span>  <span class="co"># one extra for outer bin</span></code></pre>
+<p>The implementation steps are relatively simple. First, get the "end points" of a standard lognormal curve. For distributions with infinite support, that means the quantiles that are as low (and high) as suits our purposes. For simplicity, I'll use the first and 99<sup>th</sup> percentile respectively.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># quantiles representing end points of the distribution</span>
+bin &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">start=</span><span class="ot">NA</span>,<span class="dt">end=</span><span class="ot">NA</span>,<span class="dt">step=</span><span class="ot">NA</span>)
+bin[<span class="dv">1</span>:<span class="dv">2</span>] &lt;-<span class="st"> </span><span class="kw">qlnorm</span>(<span class="kw">c</span>(<span class="fl">0.01</span>,<span class="fl">0.99</span>))</code></pre>
+<p>Next, we'll create an evenly spaced sequence between the two endpoints.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate the bin size for N bins</span>
+bin$step &lt;-<span class="st"> </span>(bin$end -<span class="st"> </span>bin$start) /<span class="st"> </span>N
+
+<span class="co"># create all x between the end points</span>
+x &lt;-<span class="st"> </span><span class="kw">seq</span>(bin$start,bin$end,<span class="dt">by=</span>bin$step)</code></pre>
+<p>Lastly, we want to calculate the probabilities for each <code>x</code>. We'll use the cumulative probability distribution for that. Each <code>x</code> will have a cumulative probability, so to get the point probability, just subtract the cumulative probability of the preceding <code>x</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">y &lt;-<span class="st"> </span><span class="kw">plnorm</span>(x)
+px &lt;-<span class="st"> </span>y[<span class="dv">2</span>:N]-y[<span class="dv">1</span>:(N<span class="dv">-1</span>)]</code></pre>
+<p>Given that the endpoints aren't the true ends of the distribution, we have to make an adjustment to ensure that calculated probabilities sum up to <code>100%</code>. Then just multiply the total amount by the vector of probabilities to get the distribution.</p>
+<pre class="sourceCode r"><code class="sourceCode r">px &lt;-<span class="st"> </span>px /<span class="st"> </span><span class="kw">sum</span>(px)  <span class="co"># ensure total prob=100%</span>
+<span class="kw">plot</span>(x[<span class="dv">2</span>:N],px*Amount,<span class="dt">main=</span><span class="st">"Example allocation"</span>,<span class="dt">axes=</span><span class="ot">FALSE</span>,
+     <span class="dt">xlab=</span><span class="st">"bins"</span>,<span class="dt">ylab=</span><span class="st">"Amount"</span>)
+<span class="kw">axis</span>(<span class="dv">2</span>)
+<span class="kw">axis</span>(<span class="dv">1</span>,<span class="dt">at=</span>x[<span class="dv">2</span>:N],<span class="dt">labels=</span><span class="dv">1</span>:(N<span class="dv">-1</span>))</code></pre>
+<div class="figure">
+<img src="posts/distributeM/figure/AllocateExample-1.png" /></div>
+<p>The example illustrates the how to do the calculation, but it would be useful to create a function that does this. However, in the function we would like the option to choose the distribution. That is, we might want to distribute according to a <code>lognormal</code>, a <code>normal</code>, a <code>exponential</code>, etc. &mdash; we just want to specify the distribution of choice as a parameter, along with any distribution specific parameters.</p>
+<p>Also, the discretisation technique is available more generally from the <code>actuar</code> library, so we may as well use that. I'll show the function first and describe some particulars below.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">require</span>(<span class="st">"actuar"</span>, <span class="dt">quietly=</span><span class="ot">TRUE</span>)
+
+<span class="co"># distribute an amount M over n bins</span>
+<span class="co"># in proportion to some distribution pdist</span>
+distributeM &lt;-<span class="st"> </span>function(nbins,<span class="dt">amount=</span><span class="dv">1</span>,<span class="dt">qmin=</span><span class="fl">0.01</span>,<span class="dt">qmax=</span><span class="fl">0.99</span>,
+                        <span class="dt">method=</span><span class="st">"rounding"</span>,<span class="dt">pdist=</span>pnorm,...){
+    distname &lt;-<span class="st"> </span><span class="kw">substring</span>(<span class="kw">deparse</span>(<span class="kw">substitute</span>(pdist)),<span class="dv">2</span>)
+    qdistr &lt;-<span class="st"> </span><span class="kw">get</span>(<span class="kw">paste</span>(<span class="st">'q'</span>,distname,<span class="dt">sep=</span><span class="st">''</span>))
+    bin &lt;-<span class="st"> </span><span class="kw">qdistr</span>(<span class="kw">c</span>(qmin,qmax),...)
+    bin[<span class="dv">3</span>] &lt;-<span class="st"> </span>(bin[<span class="dv">2</span>]-bin[<span class="dv">1</span>]) /<span class="st"> </span>nbins
+    p &lt;-<span class="st"> </span><span class="kw">discretize</span>(<span class="kw">pdist</span>(x,...), <span class="dt">method=</span>method,
+            <span class="dt">from=</span>bin[<span class="dv">1</span>],<span class="dt">to=</span>bin[<span class="dv">2</span>],<span class="dt">by=</span>bin[<span class="dv">3</span>])
+    p &lt;-<span class="st"> </span>amount *<span class="st"> </span>p /<span class="st"> </span><span class="kw">sum</span>(p)
+    <span class="kw">return</span>(p)
+}</code></pre>
+<p>Distribution functions such as <code>pnorm</code> have <em>names</em> in R. You assign such names to parameters, just like any other value. You can get the character string of those names with a function called <code>deparse</code>. However, if the name is stored in a parameter, you have to let <code>deparse</code> know that, by using the function <code>substitute</code> &mdash; meaning "don't deparse the parameter name, but instead deparse the parameter value". Also, the <code>get</code> is almost the opposite of <code>deparse</code> &mdash; given a name string, it retrieves a function (or object) name. Lastly, the <em>elipses</em> in a function represent the unknown remaining parameters that a user might provide when calling the function. Put together these functions enable us to implement a function that applies to an arbitrarily chosen distribution.</p>
+<p>Now an example using the <code>distributeM()</code> function. We'll select <code>plnorm</code> as the desired distribution, and the method <code>upper</code> to keep the results comparable with the manual example.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># example plot using distributeM function</span>
+<span class="kw">plot</span>(<span class="kw">distributeM</span>(<span class="dt">nbins=</span>N,<span class="dt">amount=</span>Amount,<span class="dt">method=</span><span class="st">"upper"</span>,<span class="dt">pdist=</span>plnorm),
+    <span class="dt">main=</span><span class="st">"Example allocation using discretise"</span>, 
+    <span class="dt">xlab=</span><span class="st">"bins"</span>,<span class="dt">ylab=</span><span class="st">"Amount"</span>)</code></pre>
+<div class="figure">
+<img src="posts/distributeM/figure/examples-1.png" /></div>
+<div class="references">
+
+</div>
+<div class="footnotes">
+<hr /><ol><li id="fn1"><p>For simplicity, assume that the businesses start from the same initial investment (i.e. asset size) and grow with the same, but random compounded rate. After a suitably long duration, the asset sizes of the businesses will be lognormally distributed, due to the Central Limit Theorem.<a href="#fnref1"><U+21A9></a></p></li>
+</ol></div>
+
+<!-- GOOGLE ANALYTICS -->
+<script><![CDATA[
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-60473518-1', 'auto');
+  ga('send', 'pageview');
+
 ]]]]><![CDATA[></script>]]></content:encoded></item><item><title>K-ary tree level probability</title><link>http://richardderozario.org/posts/karyl/karyl.html</link><guid>http://richardderozario.org/posts/karyl/karyl.html</guid><pubDate>Sat, 07 Feb 2015 00:00:00 +1100</pubDate><description>probability distribution of k-ary tree levels, with application for hierarchical processes.</description><content:encoded><![CDATA[
 <div id="header">
 <h1 class="title">K-ary tree level probability</h1>
@@ -71,7 +145,7 @@
 <p>The context is a hierarchy, like an area of business operations, with processes that are hierarchically organised. That is, the bottom level is the processing of transactions, but then there are higher level processes that affect the transaction process. For example, setting fees across groups of transactions. Then there are even higher level processes, say, setting the criteria for market segments, within which we might have different groups of fees.</p>
 <p>Now imagine that events can happen across the area at random. That means sometimes the event will touch a transaction at the bottom level, but sometimes at a higher level. If the event occurs at a higher level, then that will affect multiple transactions at the bottom level. So, what I want to know is, what is the probability that an event will happen at a particular level, and how many bottom level transactions will be affected by that event?</p>
 A simple model with a fixed number of lower level transactions enables us to calculate the probability that a given number of transactions are affected.<br /><figure><center>
-<img title="plot of chunk simple_tree" alt="plot of chunk simple_tree" width="288" src="http://richardderozario.org/posts/karyl/figure/simple_tree-1.png" /><figcaption><em>Figure 1. Simple process hierarchy as a k-ary tree. Bottom nodes are individual transactions affected.</em>
+<img title="plot of chunk simple_tree" alt="plot of chunk simple_tree" width="288" src="posts/karyl/figure/simple_tree-1.png" /><figcaption><em>Figure 1. Simple process hierarchy as a k-ary tree. Bottom nodes are individual transactions affected.</em>
 </figcaption></center>
 </figure><p>Using the <em>diagram</em> package <span class="citation">(Soetaert 2009)</span>, I have drawn a <a href="http://en.wikipedia.org/wiki/Hasse_diagram">Hasse</a> diagram in <em>Figure 1</em> of a small example hierarchy of 13 possible events, some of which are higher level, which means they affect multiple lower-level transactions. In this example, it's easy to see that there are 4 possible events where more than a single transaction is affected. This type of hierarchy is called an <a href="http://en.wikipedia.org/wiki/K-ary_tree">k-ary tree</a>. For the purpose of estimating the number of transactions affected by a higher level event, we can turn the tree into a a probability function.</p>
 <p>A convenient form of the probability function is the probability that a node is on a particular level, given a fixed group size (the number of nodes belonging to a direct parent node) and the maximum number of levels. To derive the probability mass function, we use the formula that calculates the total number of nodes in the tree (N), where <span class="math">\(L\)</span> is the maximum level, starting from zero at the top node, and <span class="math">\(g\)</span> is the group size:</p>
@@ -97,7 +171,7 @@ Note that the probability functions range over the number of levels in a tree, w
 <figure><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">rkaryl</span>(<span class="fl">1e3</span>,<span class="dv">10</span>,<span class="dv">5</span>)
 <span class="kw">hist</span>(x,<span class="dt">main=</span><span class="st">"k-ary tree level probability mass"</span>,
      <span class="dt">xlab=</span><span class="st">"level"</span>,<span class="dt">col=</span><span class="st">"grey"</span>,<span class="dt">xlim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">10</span>))</code></pre>
-<img src="http://richardderozario.org/posts/karyl/figure/example-1.png" /><figcaption><em>Figure 2. histogram of k-ary level probability density with max level of 10 and groups of 5.</em>
+<img src="posts/karyl/figure/example-1.png" /><figcaption><em>Figure 2. histogram of k-ary level probability density with max level of 10 and groups of 5.</em>
 </figcaption></figure><p><em>Bibliography</em></p>
 <div class="references">
 <p>Soetaert, Karline. 2009. "R Package Diagram: Visualising Simple Graphs, Flowcharts, and Webs." software library; CRAN.</p>
@@ -202,7 +276,7 @@ Note that the probability functions range over the number of levels in a tree, w
 <p>When I started blogging about analytics (and R), I went looking for a blogging platform that would allow me to easily post directly from R-markdown. However, the typical choices like Wordpress didn't work well in that regard. I still had to copy, paste and edit the posts, because neither the markdown nor html features from extended markdown were well supported.</p>
 <p>It seemed "static blog generators" might be the solution. These (re-)generate the blog as a set of ordinary html pages, which can then be hosted on places like <a href="https://github.com/">GitHub</a>. This means that you can just generate a html page from an R-markdown page, with something like <a href="http://johnmacfarlane.net/pandoc/">pandoc</a>, save it in a folder, and sync the blog page with the host site. Writing a blog becomes almost seamless with writing some literate R.</p>
 <p>In this rather long article, I'll document a mini blog generator, written completely in R. The individual blog pages can be standalone html documents, like those generated by <a href="http://yihui.name/knitr/">knitr</a> and pandoc from R-markdown text. Each blog post consists of a folder that contains the html page, with a sub-folder for any graphics &mdash; exactly like knitr generates. The folder may also contain other files, which are ignored by the blog, but enables the folder to be a complete project folder, such as generated by <a href="http://www.rstudio.com/">RStudio</a>. The only restriction is the naming convention: the folder has the same name (minus extension) as the main html page that contains the article. So, an example structure of folders and files might be as follows:</p>
-<figure><img src="http://richardderozario.org/posts/miniblog/figure/FolderStructure.png" /><p>
+<figure><img src="posts/miniblog/figure/FolderStructure.png" /><p>
 <figcaption><em>Figure 1: example folder structure for the blog</em>
 </figcaption></p>
 </figure><p>In the example, the top folder<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> is called <code>username.github.io</code>. That is what you would choose for the top folder name, if you hosted your site using GitHub. That is, when you create an account on GitHub, you would also create a repository named <em>username.github.io</em><a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> to host your blog, and that would automatically create a local folder by that name. If you do not host on GitHub, you may call the (local) folder anything you like.</p>
@@ -228,7 +302,7 @@ Note that the probability functions range over the number of levels in a tree, w
     &lt;/div&gt;
 </code></pre>
 <p>That's it as far as the blog structure is concerned. An index.html file in the top folder and a sub-folder called "posts" that in turn contains a folder for each article. Articles are just html files that can be produced from R-markdown text using knitr and pandoc.</p>
-<p>I prefer using pandoc for producing the final html, because it has nice code formatting, bibliography and can using a YAML-like heading section for meta-data. I also included <a href="https://disqus.com/">Disqus</a> scripts at the end of the pandoc html template to enable comments on the blog pages. A blog post template for pandoc can be found here: <a class="uri" src="http://richardderozario.org/posts/miniblog/blogpost_template.html">blogpost_template.html</a></p>
+<p>I prefer using pandoc for producing the final html, because it has nice code formatting, bibliography and can using a YAML-like heading section for meta-data. I also included <a href="https://disqus.com/">Disqus</a> scripts at the end of the pandoc html template to enable comments on the blog pages. A blog post template for pandoc can be found here: <a class="uri" src="posts/miniblog/blogpost_template.html">blogpost_template.html</a></p>
 <p>Now, onto the R-code that generates the blog site. Firstly, we require the XML libraries to handle the html files.</p>
 <pre class="sourceCode r"><code class="sourceCode r"><span class="kw">require</span>(<span class="st">"XML"</span>,<span class="dt">quietly=</span><span class="ot">TRUE</span>)
 <span class="kw">require</span>(<span class="st">"selectr"</span>,<span class="dt">quietly=</span><span class="ot">TRUE</span>)</code></pre>
@@ -526,7 +600,7 @@ blogupdate &lt;-<span class="st"> </span>function(<span class="dt">path=</span><
     }</code></pre>
 <p>For the small number of diners and dishes, the cycle isn't very long. If we simulate a large number of turns, we would see that, on average, you would expect to wait a little bit less than one cycle to get your preferred dish. That changes quickly as the number of seats increases.</p>
 <div class="figure">
-<img src="http://richardderozario.org/posts/SushiTrain/figure/hist-1.png" /></div>
+<img src="posts/SushiTrain/figure/hist-1.png" /></div>
 <div class="references">
 
 </div>
@@ -575,7 +649,7 @@ Impact = \sum^K_i X
     <span class="kw">axis</span>(<span class="dv">2</span>)
     <span class="kw">abline</span>(<span class="dt">v=</span><span class="kw">log</span>(Err$Impact[Err$Systemic==<span class="ot">TRUE</span>],<span class="dv">10</span>),<span class="dt">col=</span><span class="st">"red"</span>)</code></pre>
 <div class="figure">
-<img src="http://richardderozario.org/posts/SystemicEvents/figure/hist-1.png" /></div>
+<img src="posts/SystemicEvents/figure/hist-1.png" /></div>
 <p>As the histogram shows, the systemic events are in the tail. You'd expect that, because impact of a systemic event is a multiple of the impact of single events. However, if the single events have a heavily skewed distribution, such as a log-normal, the expected loss of an individual transaction is usually a lot lower than the larger losses. This means that the systemic event can be expected to be a multiplication of small(er) losses, which probably means that the size of the systemic events overlaps with the tail of the individual events.</p>
 <p>Now, with relatively few systemic events that affect many (but not usually close to all) transactions, would we detect them by just looking at the historical impact data? To get a better sense of this, let's simulate many years of just single loss events, as well as years of combined single and systemic events.</p>
 <figure><pre class="sourceCode r"><code class="sourceCode r">    <span class="co"># qqplot of single and combined single &amp; systemic losses</span>
@@ -591,7 +665,7 @@ Impact = \sum^K_i X
         <span class="dt">ylab=</span><span class="st">"single &amp; systemic losses"</span>)
         
     <span class="kw">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>)</code></pre>
-<img src="http://richardderozario.org/posts/SystemicEvents/figure/comparison-1.png" /><figcaption><em>Figure 1. distribution comparison: qqplot of single vs. systemic &amp; single losses</em>
+<img src="posts/SystemicEvents/figure/comparison-1.png" /><figcaption><em>Figure 1. distribution comparison: qqplot of single vs. systemic &amp; single losses</em>
 </figcaption></figure><p>With a straight comparison of many years single vs. combined systemic and single loss events, we should be able to detect the difference. As <em>Figure 1</em> shows, the distributions look the same for lower value losses, but the combined distribution has more higher value losses.</p>
 <p>However, in practice there are far fewer years to compare and the annual rate of losses varies. Below is the comparison again, but now taking into account those more realistic aspects.</p>
 <figure><pre class="sourceCode r"><code class="sourceCode r">    <span class="co"># qqplot of single and combined single and systemic losses</span>
@@ -607,7 +681,7 @@ Impact = \sum^K_i X
         <span class="dt">ylab=</span><span class="st">"single &amp; systemic losses"</span>)
         
     <span class="kw">abline</span>(<span class="dv">0</span>,<span class="dv">1</span>)</code></pre>
-<img src="http://richardderozario.org/posts/SystemicEvents/figure/comparison2-1.png" /><figcaption><em>Figure 2. qqplot of single vs. systemic &amp; single losses: less data and random rate</em>
+<img src="posts/SystemicEvents/figure/comparison2-1.png" /><figcaption><em>Figure 2. qqplot of single vs. systemic &amp; single losses: less data and random rate</em>
 </figcaption></figure><p>In the case illustrated in <em>Figure 2</em>, the differences in the tail are less clear. We could well decide that the tail differences are just outliers and that the data fits a lognormal distribution of single events.</p>
 <p>The problem of sparsity of tail events (by definition) is well known and most loss-distribution models in practice try to model the tail separately. However, most loss-distribution approaches do not, as far as I know, try to capture the underlying mechanism, such as systemic loss events, that might explain why the tail is different. Without representing such mechanisms, the models are risking their validity.</p>
 <div class="references">
