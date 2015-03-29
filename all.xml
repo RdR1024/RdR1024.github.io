@@ -62,6 +62,82 @@
   ga('create', 'UA-60473518-1', 'auto');
   ga('send', 'pageview');
 
+]]]]><![CDATA[></script>]]></content:encoded></item><item><title>Distribute an amount over bins in proportion to an arbitrary probability distribution</title><link>http://richardderozario.org/posts/distributeM/distributeM.html</link><guid>http://richardderozario.org/posts/distributeM/distributeM.html</guid><pubDate>Sat, 14 Mar 2015 00:00:00 +1100</pubDate><description>A basic method to distribute some total amount over a fixed number of bins or slots, in proportion to a probability distribution. For example, assume that you have the total assets for a number of companies, but not the individual assets. However, let’s say that you can also assume that the assets are lognormally distributed among the companies. The simple discretisation approach shown in this article will distribute the total assets across the companies in proportion to a lognormal probability distribution.</description><content:encoded><![CDATA[
+<div id="header">
+<h1 class="title">Distribute an amount over bins in proportion to an arbitrary probability distribution</h1>
+<h3 class="date">2015-03-14</h3>
+</div>
+<p>Here's a little task that I encounter repeatedly in practice: distribute a total amount among a number of components in proportion to some probability distribution. There is a simple technique for this, based on <em>discretization</em> of a probability distribution. In this article, I'll show some basic R methods to generalise a function like <code>discretize</code> to apply to an arbitrary probability distribution that we can select with a parameter.</p>
+<p>As an example of the task, imagine that you have the total assets of a number of businesses, but not the individual assets. However, with some reasonable, albeit simplifying, assumptions<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> you can also surmise that the total assets are distributed lognormally among the businesses. So, you'll want to take the total amount of assets and allocate it (arbitrarily) to the businesses so that if you were to plot the assets of each business the graph would look like a lognormal probability curve. Of course, in this example, you don't actually know which business has what size assets, just that among them the assets are distributed lognormally.</p>
+<p>To explain "discretization", I'll first implement an example manually. Let's arbitrarily say we have $500M in assets, to be distributed among 50 businesses.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># arbitrary example</span>
+Amount &lt;-<span class="st"> </span><span class="dv">500</span>
+N &lt;-<span class="st"> </span><span class="dv">51</span>  <span class="co"># one extra for outer bin</span></code></pre>
+<p>The implementation steps are relatively simple. First, get the "end points" of a standard lognormal curve. For distributions with infinite support, that means the quantiles that are as low (and high) as suits our purposes. For simplicity, I'll use the first and 99<sup>th</sup> percentile respectively. Ordinarily, we would probably choose percentiles that were further into the tails to get a better representation of the distribution.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># quantiles representing end points of the distribution</span>
+bin &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">start=</span><span class="ot">NA</span>,<span class="dt">end=</span><span class="ot">NA</span>,<span class="dt">step=</span><span class="ot">NA</span>)
+bin[<span class="dv">1</span>:<span class="dv">2</span>] &lt;-<span class="st"> </span><span class="kw">qlnorm</span>(<span class="kw">c</span>(<span class="fl">0.01</span>,<span class="fl">0.99</span>))</code></pre>
+<p>Next, we'll create an evenly spaced sequence between the two endpoints.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># calculate the bin size for N bins</span>
+bin$step &lt;-<span class="st"> </span>(bin$end -<span class="st"> </span>bin$start) /<span class="st"> </span>N
+
+<span class="co"># create all x between the end points</span>
+x &lt;-<span class="st"> </span><span class="kw">seq</span>(bin$start,bin$end,<span class="dt">by=</span>bin$step)</code></pre>
+<p>Lastly, we want to calculate the probabilities for each <code>x</code>. We'll use the cumulative probability distribution for that. Each <code>x</code> will have a cumulative probability, so to get the point probability, just subtract the cumulative probability of the preceding <code>x</code>.</p>
+<pre class="sourceCode r"><code class="sourceCode r">y &lt;-<span class="st"> </span><span class="kw">plnorm</span>(x)
+px &lt;-<span class="st"> </span>y[<span class="dv">2</span>:N]-y[<span class="dv">1</span>:(N<span class="dv">-1</span>)]</code></pre>
+<p>Given that the endpoints aren't the true ends of the distribution, we have to make an adjustment to ensure that calculated probabilities sum up to <code>100%</code>. Then just multiply the total amount by the vector of probabilities to get the distribution.</p>
+<pre class="sourceCode r"><code class="sourceCode r">px &lt;-<span class="st"> </span>px /<span class="st"> </span><span class="kw">sum</span>(px)  <span class="co"># ensure total prob=100%</span>
+<span class="kw">plot</span>(x[<span class="dv">2</span>:N],px*Amount,<span class="dt">main=</span><span class="st">"Example allocation"</span>,<span class="dt">axes=</span><span class="ot">FALSE</span>,
+     <span class="dt">xlab=</span><span class="st">"bins"</span>,<span class="dt">ylab=</span><span class="st">"Amount"</span>)
+<span class="kw">axis</span>(<span class="dv">2</span>)
+<span class="kw">axis</span>(<span class="dv">1</span>,<span class="dt">at=</span>x[<span class="dv">2</span>:N],<span class="dt">labels=</span><span class="dv">1</span>:(N<span class="dv">-1</span>))</code></pre>
+<div class="figure">
+<img src="posts/distributeM/figure/AllocateExample-1.png" /></div>
+<p>The example illustrates the how to do the calculation, but it would be useful to create a function that does this. However, in the function we would like the option to choose the distribution. That is, we might want to distribute according to a <code>lognormal</code>, a <code>normal</code>, a <code>exponential</code>, etc. &mdash; we just want to specify the distribution of choice as a parameter, along with any distribution specific parameters.</p>
+<p>Also, the discretisation technique is available more generally from the <code>actuar</code> library, so we may as well use that. I'll show the function first and describe some particulars below.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">require</span>(<span class="st">"actuar"</span>, <span class="dt">quietly=</span><span class="ot">TRUE</span>)
+
+<span class="co"># distribute an amount M over n bins</span>
+<span class="co"># in proportion to some distribution pdist</span>
+distributeM &lt;-<span class="st"> </span>function(nbins,<span class="dt">amount=</span><span class="dv">1</span>,<span class="dt">qmin=</span><span class="fl">0.0001</span>,<span class="dt">qmax=</span><span class="fl">0.9999</span>,
+                        <span class="dt">method=</span><span class="st">"rounding"</span>,<span class="dt">pdist=</span>pnorm,...){
+    distname &lt;-<span class="st"> </span><span class="kw">substring</span>(<span class="kw">deparse</span>(<span class="kw">substitute</span>(pdist)),<span class="dv">2</span>)
+    qdistr &lt;-<span class="st"> </span><span class="kw">get</span>(<span class="kw">paste</span>(<span class="st">'q'</span>,distname,<span class="dt">sep=</span><span class="st">''</span>))
+    bin &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">start=</span><span class="ot">NA</span>,<span class="dt">end=</span><span class="ot">NA</span>,<span class="dt">step=</span><span class="ot">NA</span>)
+    bin[<span class="dv">1</span>:<span class="dv">2</span>] &lt;-<span class="st"> </span><span class="kw">qdistr</span>(<span class="kw">c</span>(qmin,qmax),...)
+    bin$step &lt;-<span class="st"> </span>(bin$end -<span class="st"> </span>bin$start) /<span class="st"> </span>nbins
+    p &lt;-<span class="st"> </span><span class="kw">discretize</span>(<span class="kw">pdist</span>(x,...), <span class="dt">method=</span>method,
+            <span class="dt">from=</span>bin$start,<span class="dt">to=</span>bin$end,<span class="dt">by=</span>bin$step)
+    p &lt;-<span class="st"> </span>amount *<span class="st"> </span>p /<span class="st"> </span><span class="kw">sum</span>(p)
+    <span class="kw">return</span>(p)
+}</code></pre>
+<p>Distribution functions such as <code>pnorm</code> have <em>names</em> in R. You assign such names to parameters, just like any other value. You can get the character string of those names with a function called <code>deparse</code>. However, if the name is stored in a parameter, you have to let <code>deparse</code> know that, by using the function <code>substitute</code> &mdash; meaning "don't deparse the parameter name, but instead deparse the parameter value". Also, the <code>get</code> is almost the opposite of <code>deparse</code> &mdash; given a name string, it retrieves a function (or object) name. Lastly, the <em>elipses</em> in a function represent the unknown remaining parameters that a user might provide when calling the function. Put together these functions enable us to implement a function that applies to an arbitrarily chosen distribution.</p>
+<p>Now an example using the <code>distributeM()</code> function. We'll select <code>plnorm</code> as the desired distribution, the 1<sup>st</sup> and 99<sup>th</sup> percentiles as end points, and the method <code>upper</code> to keep the results comparable with the manual example.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># example plot using distributeM function</span>
+<span class="kw">plot</span>(<span class="kw">distributeM</span>(<span class="dt">nbins=</span>N,<span class="dt">amount=</span>Amount,<span class="dt">method=</span><span class="st">"upper"</span>,
+    <span class="dt">qmin=</span><span class="fl">0.01</span>,<span class="dt">qmax=</span><span class="fl">0.99</span>, <span class="dt">pdist=</span>plnorm),
+    <span class="dt">main=</span><span class="st">"Example allocation using discretise"</span>, 
+    <span class="dt">xlab=</span><span class="st">"bins"</span>,<span class="dt">ylab=</span><span class="st">"Amount"</span>)</code></pre>
+<div class="figure">
+<img src="posts/distributeM/figure/examples-1.png" /></div>
+<div class="references">
+
+</div>
+<div class="footnotes">
+<hr /><ol><li id="fn1"><p>For simplicity, assume that the businesses start from the same initial investment (i.e. asset size) and grow with the same, but random compounded rate. After a suitably long duration, the asset sizes of the businesses will be lognormally distributed, due to the Central Limit Theorem.<a href="#fnref1"><U+21A9></a></p></li>
+</ol></div>
+
+<!-- GOOGLE ANALYTICS -->
+<script><![CDATA[
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-60473518-1', 'auto');
+  ga('send', 'pageview');
+
 ]]]]><![CDATA[></script>]]></content:encoded></item><item><title>K-ary tree level probability</title><link>http://richardderozario.org/posts/karyl/karyl.html</link><guid>http://richardderozario.org/posts/karyl/karyl.html</guid><pubDate>Sat, 07 Feb 2015 00:00:00 +1100</pubDate><description>probability distribution of k-ary tree levels, with application for hierarchical processes.</description><content:encoded><![CDATA[
 <div id="header">
 <h1 class="title">K-ary tree level probability</h1>
