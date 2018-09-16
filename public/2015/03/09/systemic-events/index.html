@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en-au">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.30.2" />
+
+
+<title>Systemic events - Richard de Rozario</title>
+<meta property="og:title" content="Systemic events - Richard de Rozario">
+
+
+
+  
+  <meta property="description" content="One of the most significant things that the Basel II accord did for Operational Risk was to call attention to its heavy tailed nature. An organisation may have years of almost trivial losses, and then experience a loss event that is hundreds of times larger. This characteristic of rare and very large losses presents quite a challenge to quantitative models. Most loss-distribution approaches do not try to capture the underlying mechanism that might explain why the tail is different.  I look at one possibility in this article.">
+  
+
+
+
+
+
+
+
+
+<link href='//cdn.bootcss.com/highlight.js/9.11.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  
+  <a href="/" class="nav-logo">
+    <img src="/images/RdRfacetiny2014.jpg"
+         width="55"
+         height="64"
+         alt="RdR">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="https://github.com/RdR1024">GitHub</a></li>
+    
+    <li><a href="https://www.linkedin.com/in/rderozario">LinkedIn</a></li>
+    
+  </ul>
+</nav>
+ RdR
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">6 min read</span>
+    
+
+    <h1 class="article-title">Systemic events</h1>
+
+    
+    <span class="article-date">2015/03/09</span>
+    
+
+    <div class="article-content">
+      <p>One of the most significant things that the Basel II accord did for Operational Risk was to call attention to its heavy tailed nature. An organisation may have years of almost trivial losses, and then experience a loss event that is hundreds of times larger. This characteristic of rare and very large losses presents quite a challenge to quantitative models. Even fitting the data to heavy-tailed distributions doesn’t usually solve the problem, and most loss-distribution based models will try to model the tail events separately. However, there is not a lot of theory underneath the modelling that explains why the tail might be different.</p>
+<p>There is a lot of talk about mixture models, lack of data, correlations and so forth, but I wondered what a mechanism might be that would justify our supposition that the tail events are fundamentally different, yet intrinsically tied to the other losses. A possible explanation is hinted at in casual conversation about operational losses, namely “systemic events” – where multiple unit components (like multiple transactions, multiple customers, or multiple businesses) are affected by a single event.</p>
+<p>For example, imagine a payments process. The stream of individual transactions will experience occasional losses, typically due to keying errors or similar mistakes. However, the process is also part of a network of other processes, such as customer on-boarding, setting fee and interest rates, and so forth. In hierarchical fashion, some processes can affect multiple lower level transactions.</p>
+<p>So, what might loss distributions look like if you assume systemic effects, like a process hierarchy?</p>
+<p>Let’s simulate an example, with some (I hope) reasonable assumptions. To start, assume a business process that is hierarchically organised, like the payments example above. Next, let’s say that loss events (errors, frauds, interruptions, etc.) occur in the business operations at a rate of, say 360 per year, with a systemic event about 4 times a year. If an event occurs at a higher level process, then it affects multiple lower-level transactions – in effect, it becomes multiple events.</p>
+<p>We can model the systemic hierarchy using the <a href="http://richardderozario.org/posts/karyl/karyl.html">k-ary level probabilities</a> that I wrote about in an earlier post. Essentially, the k-ary hierarchy acts as an upper limit for the more random hierarchy that might exist in reality. The closest k-ary tree for our assumptions will have a group size of 100 and a maximum level of 3.</p>
+<p>Experience shows that the impacts of operational losses are typically heavy-tailed (even without systemic events). I’ll chose the common lognormal distribution with a meanlog of 7 (about $1000) and standard deviation (log) of 2. For the purposes of analysis, the parameter choices don’t matter, except in relation to the systemic effects (more on that later).</p>
+<p>For simplicity, we’ll keep the annual rate of events a constant, although for realistic models that would also be a random variable – typically Poisson or Negative Binomially distributed. Keeping the rate of events constant allows us to focus on the impact. With the systemic modification, the impact formulation can be summarised as:</p>
+<p><span class="math display">\[
+Impact = \sum^K_i X
+\]</span> where <span class="math inline">\(K\)</span> is a random variable following the k-rary level distribution and <span class="math inline">\(X\)</span> is a random variable following the log-normal distribution.</p>
+<p>We’ll generate the results in a table, so that we can distinguish the systemic from single events.</p>
+<pre class="r"><code>    source(&quot;./karyl.R&quot;)  # use k-ary tree probability
+    set.seed(123)   # make this single simulation reproducible
+    
+    gsize &lt;- 100    # group size
+    Lmax &lt;- 3       # max level
+    nSim = 30*12    # one year of events
+    Err &lt;- data.frame(Impact=gsize^(Lmax-rkaryl(nSim,Lmax,gsize)), Systemic=FALSE)
+    Err$Systemic[Err$Impact&gt;1] &lt;- TRUE
+    Err$Impact &lt;- sapply(Err$Impact,function(i){sum(rlnorm(i,meanlog=7,sdlog=2))})</code></pre>
+<p>The distribution of the impact of the errors is easiest to see on a log-scale. In addition to the histogram, I’ll draw some red vertical lines so that we can see where the systemic losses are.</p>
+<pre class="r"><code>    # distribution of loss event impact
+    source(&quot;./loglabels.R&quot;)
+    br&lt;-hist(log(Err$Impact,10),axes=F,
+        main=&quot;systemic loss effect&quot;, xlab=&quot;log of impact&quot;)$breaks
+    axis(1,at=br,labels=loglabels(br))
+    axis(2)
+    abline(v=log(Err$Impact[Err$Systemic==TRUE],10),col=&quot;red&quot;)</code></pre>
+<p><img src="/post/SystemicEvents_files/figure-html/hist-1.png" width="672" /></p>
+<p>As the histogram shows, the systemic events are in the tail. You’d expect that, because impact of a systemic event is a multiple of the impact of single events. However, if the single events have a heavily skewed distribution, such as a log-normal, the expected loss of an individual transaction is usually a lot lower than the larger losses. This means that the systemic event can be expected to be a multiplication of small(er) losses, which probably means that the size of the systemic events overlaps with the tail of the individual events.</p>
+<p>Now, with relatively few systemic events that affect many (but not usually close to all) transactions, would we detect them by just looking at the historical impact data? To get a better sense of this, let’s simulate many years of just single loss events, as well as years of combined single and systemic events.</p>
+<figure>
+<pre class="r"><code>    # qqplot of single and combined single &amp; systemic losses
+    x &lt;- replicate(10000, sum(rlnorm(nSim, meanlog=7, sdlog=2 )))
+    
+    y &lt;- replicate(10000, sum(rlnorm(
+        gsize^(Lmax-rkaryl(nSim,Lmax,gsize)),
+        meanlog=7, sdlog=2)))
+        
+    qqplot(x,y,
+        main=&quot;single vs. systemic &amp; single losses&quot;,
+        xlab=&quot;single losses&quot;, 
+        ylab=&quot;single &amp; systemic losses&quot;)
+        
+    abline(0,1)</code></pre>
+<img src="/post/SystemicEvents_files/figure-html/comparison-1.png" width="672" />
+<figcaption>
+<em>Figure 1. distribution comparison: qqplot of single vs. systemic &amp; single losses</em>
+</figcaption>
+</figure>
+<p>With a straight comparison of many years single vs. combined systemic and single loss events, we should be able to detect the difference. As <em>Figure 1</em> shows, the distributions look the same for lower value losses, but the combined distribution has more higher value losses.</p>
+<p>However, in practice there are far fewer years to compare and the annual rate of losses varies. Below is the comparison again, but now taking into account those more realistic aspects.</p>
+<figure>
+<pre class="r"><code>    # qqplot of single and combined single and systemic losses
+    x &lt;- replicate(500, sum(rlnorm(rpois(1,nSim), meanlog=7, sdlog=2 )))
+    
+    y &lt;- replicate(500, sum(rlnorm(
+        gsize^(Lmax-rkaryl(rpois(1,nSim),Lmax,gsize)),
+        meanlog=7, sdlog=2)))
+        
+    qqplot(x,y,
+        main=&quot;single vs. systemic &amp; single losses&quot;,
+        xlab=&quot;single losses&quot;, 
+        ylab=&quot;single &amp; systemic losses&quot;)
+        
+    abline(0,1)</code></pre>
+<img src="/post/SystemicEvents_files/figure-html/comparison2-1.png" width="672" />
+<figcaption>
+<em>Figure 2. qqplot of single vs. systemic &amp; single losses: less data and random rate</em>
+</figcaption>
+</figure>
+<p>In the case illustrated in <em>Figure 2</em>, the differences in the tail are less clear. We could well decide that the tail differences are just outliers and that the data fits a lognormal distribution of single events.</p>
+<p>The problem of sparsity of tail events (by definition) is well known and most loss-distribution models in practice try to model the tail separately. However, most loss-distribution approaches do not, as far as I know, try to capture the underlying mechanism, such as systemic loss events, that might explain why the tail is different. Without representing such mechanisms, the models are risking their validity.</p>
+
+    </div>
+  </article>
+  
+  <div id="disqus_thread"></div>
+<script>
+(function() {
+var d = document, s = d.createElement('script');
+s.src = 'https://richardderozario.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/highlight.min.js"></script>
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/r.min.js"></script>
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/js/math-code.js"></script>
+<script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+

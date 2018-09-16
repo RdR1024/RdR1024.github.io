@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Richard de Rozario</title>
+    <link>/</link>
+    <description>Recent content on Richard de Rozario</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-au</language>
+    <lastBuildDate>Fri, 14 Sep 2018 10:49:13 +1000</lastBuildDate>
+    
+	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>About</title>
+      <link>/about/</link>
+      <pubDate>Fri, 14 Sep 2018 10:49:13 +1000</pubDate>
+      
+      <guid>/about/</guid>
+      <description>I am an information systems researcher and consultant, with a speciality in risk and intelligence. Much of my work involves helping organisations make the most of the knowledge that their people have through elicitation techniques, analytical modeling and system design.
+Currently, I&amp;rsquo;m leading the design of a system for collaborative intelligence analysis through the University of Melbourne. Before that, I modelled extreme operational risk scenarios in the banking industry and conducted long range scenario elicitation for defence.</description>
+    </item>
+    
+    <item>
+      <title>Distribute an amount over bins</title>
+      <link>/2015/03/14/distribute-an-amount-over-bins/</link>
+      <pubDate>Sat, 14 Mar 2015 00:00:00 +0000</pubDate>
+      
+      <guid>/2015/03/14/distribute-an-amount-over-bins/</guid>
+      <description>Here’s a little task that I encounter repeatedly in practice: distribute a total amount among a number of components in proportion to some probability distribution. There is a simple technique for this, based on discretization of a probability distribution. In this article, I’ll show some basic R methods to generalise a function like discretize to apply to an arbitrary probability distribution that we can select with a parameter.
+As an example of the task, imagine that you have the total assets of a number of businesses, but not the individual assets.</description>
+    </item>
+    
+    <item>
+      <title>Systemic events</title>
+      <link>/2015/03/09/systemic-events/</link>
+      <pubDate>Mon, 09 Mar 2015 00:00:00 +0000</pubDate>
+      
+      <guid>/2015/03/09/systemic-events/</guid>
+      <description>One of the most significant things that the Basel II accord did for Operational Risk was to call attention to its heavy tailed nature. An organisation may have years of almost trivial losses, and then experience a loss event that is hundreds of times larger. This characteristic of rare and very large losses presents quite a challenge to quantitative models. Even fitting the data to heavy-tailed distributions doesn’t usually solve the problem, and most loss-distribution based models will try to model the tail events separately.</description>
+    </item>
+    
+    <item>
+      <title>Sushi Train</title>
+      <link>/2015/03/02/sushi-train/</link>
+      <pubDate>Mon, 02 Mar 2015 00:00:00 +0000</pubDate>
+      
+      <guid>/2015/03/02/sushi-train/</guid>
+      <description>We ate at the Sakura Kaiten sushi restaurant on Friday. It’s almost a cliché that nerds like trains, so eating at a restaurant that delivers a continuous stream of delights through a rotary conveyor belt is a particular joy. I couldn’t help myself, though. When V. remarked that she was waiting for her favourite crispy crab to come around, I started wondering about the analytics of the sushi train.
+So, you’ve got people sitting around this rotating stream of little dishes, and everybody just takes the dish that they want the most at that moment.</description>
+    </item>
+    
+    <item>
+      <title>K-ary tree level probability</title>
+      <link>/2015/02/07/k-ary-tree-level-probability/</link>
+      <pubDate>Sat, 07 Feb 2015 00:00:00 +0000</pubDate>
+      
+      <guid>/2015/02/07/k-ary-tree-level-probability/</guid>
+      <description>On the weekend, I ran into a problem that needed a probability distribution that I hadn’t seen before. I googled around, but couldn’t find any implementation of what I needed. It’s probably out there, somewhere on page umpteen of the search results, but I figured it was a good opportunity to implement a custom distribution in R.
+The context is a hierarchy, like an area of business operations, with processes that are hierarchically organised.</description>
+    </item>
+    
+    <item>
+      <title>Melbourne Holidays</title>
+      <link>/2015/02/01/melbourne-holidays/</link>
+      <pubDate>Sun, 01 Feb 2015 00:00:00 +0000</pubDate>
+      
+      <guid>/2015/02/01/melbourne-holidays/</guid>
+      <description>Calendar calculations are probably one of the oldest applications of math to everyday problems. In the past, real-world problems may have driven the calculation of calendars, but these days the reverse may also be true. Recently, I was looking at a time-series that seemed to have calendar effects: volumes of activities varied relative to public holidays.
+Since I use R for my analysis, I needed a function to calculate the public holidays for Melbourne, which I’ll describe here.</description>
+    </item>
+    
+    <item>
+      <title>The value of advice</title>
+      <link>/2015/01/22/the-value-of-advice/</link>
+      <pubDate>Thu, 22 Jan 2015 00:00:00 +0000</pubDate>
+      
+      <guid>/2015/01/22/the-value-of-advice/</guid>
+      <description>On one of my first consulting jobs I interviewed a scientist with the one of the government water authorities. At the end I said, &amp;ldquo;&amp;hellip;so basically, you go around to the weirs, take samples, analyse the water quality to advise the minister, who then acts on that advice?&amp;rdquo;
+&amp;ldquo;Yes,&amp;rdquo; she said, &amp;ldquo;everything except the last bit.&amp;rdquo;
+Currently, I&amp;rsquo;m taking stock to see where the research on decision support has gotten to in the last decade or so &amp;ndash; especially with regards to the core problem of &amp;ldquo;usage&amp;rdquo;.</description>
+    </item>
+    
+    <item>
+      <title>The Completeness of Categories</title>
+      <link>/2015/01/14/the-completeness-of-categories/</link>
+      <pubDate>Wed, 14 Jan 2015 00:00:00 +0000</pubDate>
+      
+      <guid>/2015/01/14/the-completeness-of-categories/</guid>
+      <description>Lately, I’ve been wrestling with the question of “how many categories are enough?” The start of many a risk analysis is to categorise the risks. A categorisation serves as a checklist for the completeness of the analysis, and as a way of organising the many possible risks. Typically, the categories capture some essential aspect of a causal mechanism or effect which typifies the risk. For example, we might use “Internal Fraud” and “External Fraud” as a categories, thus distinguishing different causes of a particular financial impact.</description>
+    </item>
+    
+    <item>
+      <title>The Annual March</title>
+      <link>/2014/06/21/the-annual-march/</link>
+      <pubDate>Sat, 21 Jun 2014 00:00:00 +0000</pubDate>
+      
+      <guid>/2014/06/21/the-annual-march/</guid>
+      <description>The next time you want to catch your breath from a busy morning of statistical modelling, head to Flagstaff Gardens. You can buy a nice roll from Vic Markets and enjoy the fresh air and leafy surrounds. Go ahead, munch your lunch, look up at the fresh sky… and enjoy the hallowed grounds of Melbourne’s first analytics colleague, Georg von Neumayer.
+We may call our work “predictive analytics” now, but that’s just the latest spin.</description>
+    </item>
+    
+  </channel>
+</rss>

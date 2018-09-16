@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en-au">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.30.2" />
+
+
+<title>Distribute an amount over bins - Richard de Rozario</title>
+<meta property="og:title" content="Distribute an amount over bins - Richard de Rozario">
+
+
+
+  
+  <meta property="description" content="A basic method to distribute some total amount over a fixed number of bins or slots, in proportion to a probability distribution.  For example, assume that you have the total assets for a number of companies, but not the individual assets.  However, let&#39;s say that you can also assume that the assets are lognormally distributed among the companies.  The simple discretisation approach shown in this article will distribute the total assets across the companies in proportion to a lognormal probability distribution.">
+  
+
+
+
+
+
+
+
+
+<link href='//cdn.bootcss.com/highlight.js/9.11.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  
+  <a href="/" class="nav-logo">
+    <img src="/images/RdRfacetiny2014.jpg"
+         width="55"
+         height="64"
+         alt="RdR">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="https://github.com/RdR1024">GitHub</a></li>
+    
+    <li><a href="https://www.linkedin.com/in/rderozario">LinkedIn</a></li>
+    
+  </ul>
+</nav>
+ RdR
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">4 min read</span>
+    
+
+    <h1 class="article-title">Distribute an amount over bins</h1>
+
+    
+    <span class="article-date">2015/03/14</span>
+    
+
+    <div class="article-content">
+      <p>Here’s a little task that I encounter repeatedly in practice: distribute a total amount among a number of components in proportion to some probability distribution. There is a simple technique for this, based on <em>discretization</em> of a probability distribution. In this article, I’ll show some basic R methods to generalise a function like <code>discretize</code> to apply to an arbitrary probability distribution that we can select with a parameter.</p>
+<p>As an example of the task, imagine that you have the total assets of a number of businesses, but not the individual assets. However, with some reasonable, albeit simplifying, assumptions<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> you can also surmise that the total assets are distributed lognormally among the businesses. So, you’ll want to take the total amount of assets and allocate it (arbitrarily) to the businesses so that if you were to plot the assets of each business the graph would look like a lognormal probability curve. Of course, in this example, you don’t actually know which business has what size assets, just that among them the assets are distributed lognormally.</p>
+<p>To explain “discretization”, I’ll first implement an example manually. Let’s arbitrarily say we have $500M in assets, to be distributed among 50 businesses.</p>
+<pre class="r"><code># arbitrary example
+Amount &lt;- 500
+N &lt;- 51  # one extra for outer bin</code></pre>
+<p>The implementation steps are relatively simple. First, get the “end points” of a standard lognormal curve. For distributions with infinite support, that means the quantiles that are as low (and high) as suits our purposes. For simplicity, I’ll use the first and 99<sup>th</sup> percentile respectively. Ordinarily, we would probably choose percentiles that were further into the tails to get a better representation of the distribution.</p>
+<pre class="r"><code># quantiles representing end points of the distribution
+bin &lt;- list(start=NA,end=NA,step=NA)
+bin[1:2] &lt;- qlnorm(c(0.01,0.99))</code></pre>
+<p>Next, we’ll create an evenly spaced sequence between the two endpoints.</p>
+<pre class="r"><code># calculate the bin size for N bins
+bin$step &lt;- (bin$end - bin$start) / N
+
+# create all x between the end points
+x &lt;- seq(bin$start,bin$end,by=bin$step)</code></pre>
+<p>Lastly, we want to calculate the probabilities for each <code>x</code>. We’ll use the cumulative probability distribution for that. Each <code>x</code> will have a cumulative probability, so to get the point probability, just subtract the cumulative probability of the preceding <code>x</code>.</p>
+<pre class="r"><code>y &lt;- plnorm(x)
+px &lt;- y[2:N]-y[1:(N-1)]</code></pre>
+<p>Given that the endpoints aren’t the true ends of the distribution, we have to make an adjustment to ensure that calculated probabilities sum up to <code>100%</code>. Then just multiply the total amount by the vector of probabilities to get the distribution.</p>
+<pre class="r"><code>px &lt;- px / sum(px)  # ensure total prob=100%
+plot(x[2:N],px*Amount,main=&quot;Example allocation&quot;,axes=FALSE,
+     xlab=&quot;bins&quot;,ylab=&quot;Amount&quot;)
+axis(2)
+axis(1,at=x[2:N],labels=1:(N-1))</code></pre>
+<p><img src="/post/distributeM_files/figure-html/AllocateExample-1.png" width="672" /></p>
+<p>The example illustrates the how to do the calculation, but it would be useful to create a function that does this. However, in the function we would like the option to choose the distribution. That is, we might want to distribute according to a <code>lognormal</code>, a <code>normal</code>, a <code>exponential</code>, etc. – we just want to specify the distribution of choice as a parameter, along with any distribution specific parameters.</p>
+<p>Also, the discretisation technique is available more generally from the <code>actuar</code> library, so we may as well use that. I’ll show the function first and describe some particulars below.</p>
+<pre class="r"><code>require(&quot;actuar&quot;, quietly=TRUE)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;actuar&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:grDevices&#39;:
+## 
+##     cm</code></pre>
+<pre class="r"><code># distribute an amount M over n bins
+# in proportion to some distribution pdist
+distributeM &lt;- function(nbins,amount=1,qmin=0.0001,qmax=0.9999,
+                        method=&quot;rounding&quot;,pdist=pnorm,...){
+    distname &lt;- substring(deparse(substitute(pdist)),2)
+    qdistr &lt;- get(paste(&#39;q&#39;,distname,sep=&#39;&#39;))
+    bin &lt;- list(start=NA,end=NA,step=NA)
+    bin[1:2] &lt;- qdistr(c(qmin,qmax),...)
+    bin$step &lt;- (bin$end - bin$start) / nbins
+    p &lt;- discretize(pdist(x,...), method=method,
+            from=bin$start,to=bin$end,by=bin$step)
+    p &lt;- amount * p / sum(p)
+    return(p)
+}</code></pre>
+<p>Distribution functions such as <code>pnorm</code> have <em>names</em> in R. You assign such names to parameters, just like any other value. You can get the character string of those names with a function called <code>deparse</code>. However, if the name is stored in a parameter, you have to let <code>deparse</code> know that, by using the function <code>substitute</code> – meaning “don’t deparse the parameter name, but instead deparse the parameter value”. Also, the <code>get</code> is almost the opposite of <code>deparse</code> – given a name string, it retrieves a function (or object) name. Lastly, the <em>elipses</em> in a function represent the unknown remaining parameters that a user might provide when calling the function. Put together these functions enable us to implement a function that applies to an arbitrarily chosen distribution.</p>
+<p>Now an example using the <code>distributeM()</code> function. We’ll select <code>plnorm</code> as the desired distribution, the 1<sup>st</sup> and 99<sup>th</sup> percentiles as end points, and the method <code>upper</code> to keep the results comparable with the manual example.</p>
+<pre class="r"><code># example plot using distributeM function
+plot(distributeM(nbins=N,amount=Amount,method=&quot;upper&quot;,
+    qmin=0.01,qmax=0.99, pdist=plnorm),
+    main=&quot;Example allocation using discretise&quot;, 
+    xlab=&quot;bins&quot;,ylab=&quot;Amount&quot;)</code></pre>
+<p><img src="/post/distributeM_files/figure-html/examples-1.png" width="672" /></p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>For simplicity, assume that the businesses start from the same initial investment (i.e. asset size) and grow with the same, but random compounded rate. After a suitably long duration, the asset sizes of the businesses will be lognormally distributed, due to the Central Limit Theorem.<a href="#fnref1">↩</a></p></li>
+</ol>
+</div>
+
+    </div>
+  </article>
+  
+  <div id="disqus_thread"></div>
+<script>
+(function() {
+var d = document, s = d.createElement('script');
+s.src = 'https://richardderozario.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/highlight.min.js"></script>
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/r.min.js"></script>
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/js/math-code.js"></script>
+<script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+
